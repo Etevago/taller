@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "crud-6814c": {
+      "hosting": {
+        "ingresoEgresoApp": [
+          "crud-6814c"
+        ]
+      }
+    }
+  }
+}
