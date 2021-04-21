@@ -20,6 +20,7 @@ import { SidebarComponent } from '../shared/sidebar/sidebar.component';
     NavbarComponent,
     FooterComponent,
     SidebarComponent,
+
   ]
 })
 export class SharedModule { }

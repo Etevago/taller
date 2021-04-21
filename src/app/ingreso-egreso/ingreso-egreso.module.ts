@@ -11,6 +11,7 @@ import { DetalleComponent } from '../ingreso-egreso/detalle/detalle.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { ingresoEgresoReducer } from './ingreso-egreso.reducer';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,9 @@ import { ingresoEgresoReducer } from './ingreso-egreso.reducer';
     ReactiveFormsModule,
     SharedModule,
     DashboardRoutesModule,
-    StoreModule.forFeature("ingresosEgresos", ingresoEgresoReducer)
+    StoreModule.forFeature("ingresosEgresos", ingresoEgresoReducer),
+    MatProgressBarModule
+
 
   ],
   exports: [

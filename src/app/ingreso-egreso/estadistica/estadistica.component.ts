@@ -1,13 +1,19 @@
+import { DashboardService } from './../../dashboard/dashboard.service';
 import { AppStateIngreso } from './../ingreso-egreso.reducer';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { IngresoEgreso } from 'src/app/models/ingreso-egreso.model';
+import { contadorReducer } from './estadistica.reducer';
+import { contador } from './estadistica.actions';
+import { takeUntil } from 'rxjs/operators';
+import { interval, timer } from 'rxjs';
 
 
 @Component({
   selector: 'app-estadistica',
   templateUrl: './estadistica.component.html',
   styles: [
+
   ]
 })
 export class EstadisticaComponent implements OnInit {
@@ -17,16 +23,23 @@ export class EstadisticaComponent implements OnInit {
   totalIngresos: number = 0;
   totalEgresos: number = 0;
   total: number;
+  contador: number = 0;
+  parar: boolean;
 
 
-
-  constructor(private store: Store<AppStateIngreso>) {
+  constructor(private store: Store<AppStateIngreso>, private ds: DashboardService) {
   }
 
   ngOnInit(): void {
+
     this.store.select("ingresosEgresos").subscribe(({ items }: any) => {
       this.generarEstadistica(items)
     })
+
+    this.store.select("contador").subscribe(({ cont }) => {
+      this.contador = cont;
+    })
+
   }
 
   generarEstadistica(items: (IngresoEgreso[] | any)) {
@@ -43,7 +56,25 @@ export class EstadisticaComponent implements OnInit {
 
   }
 
+  reparar() {
+    this.ds.crearReparacion()
+    this.store.select("contador").subscribe(params => {
+      this.parar = params.parar
+    })
+    setInterval(() => {
+      if (this.contador >= 100) {
+        this.ds.stopReparacion();
+        return;
+      }
+      else if (this.parar) {
+        return;
+      }
+      console.log("sumando funcion");
+      this.store.dispatch(contador())
+    }, 1000)
 
+
+  }
 
 
 }

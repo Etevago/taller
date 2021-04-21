@@ -1,7 +1,7 @@
 import * as ui from './../../shared/ui.actions';
 import { AuthService } from './../../services/auth.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
@@ -31,14 +31,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     this.uiSub = this.store.select("ui").subscribe(ui =>
       this.loading = ui.isLoading)
-
   }
 
 
 
 
   ngOnDestroy() {
-    this.uiSub.unsubscribe()
+    this.uiSub?.unsubscribe()
   }
 
   crearUsuario() {
@@ -62,12 +61,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
       })
       .catch(error => {
         this.store.dispatch(ui.stopLoading())
-
+        console.log(error);
         Swal.fire({
           icon: 'error',
-          title: 'Oops...',
+          title: 'Error',
           text: error.message,
-          footer: '<a href>Why do I have this issue?</a>'
         })
       })
   }

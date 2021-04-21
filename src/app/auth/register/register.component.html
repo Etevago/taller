@@ -28,13 +28,18 @@
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <input formControlName="password" type="password" class="form-control" placeholder="Password">
+                                <input formControlName="password" id="password" type="password" class="form-control" placeholder="Password">
                                 <div class="input-group-append">
                                     <span class="input-group-text">
                       <i *ngIf="registro.get('password').valid" class="fa fa-check-circle"></i>
-                    </span>
+                                    </span>
+
                                 </div>
+
                             </div>
+                            <p *ngIf="registro.get('password').invalid  " class="text-danger">La contraseña debe contener un mínimo de 6 caracteres</p>
+
+
                         </div>
 
                         <div class="form-group">

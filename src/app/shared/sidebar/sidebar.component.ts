@@ -1,3 +1,5 @@
+import { stopContador } from './../../ingreso-egreso/estadistica/estadistica.actions';
+import { DashboardService } from './../../dashboard/dashboard.service';
 import { map } from 'rxjs/operators';
 import { AuthService } from './../../services/auth.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -16,7 +18,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   nombre: string;
   userSub: Subscription;
-  constructor(private auth: AuthService, private router: Router, private store: Store<AppState>) { }
+  reparando: boolean
+  constructor(private auth: AuthService, private router: Router, private store: Store<AppState>, private ds: DashboardService) { }
 
   ngOnInit(): void {
 
@@ -25,6 +28,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+
+    this.store.select("contador").subscribe(params => {
+      this.reparando = params.reparando
+    })
+    if (this.reparando){
+      this.ds.crearReparacion()
+    }
+    this.store.dispatch(stopContador())
     this.userSub.unsubscribe()
   }
 

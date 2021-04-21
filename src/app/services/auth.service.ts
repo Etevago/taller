@@ -33,7 +33,7 @@ export class AuthService {
           this.store.dispatch(auth.setUser({ user }))
         })
       } else {
-        this.userSub.unsubscribe()
+        this.userSub?.unsubscribe()
         this._user = null;
         this.store.dispatch(auth.unSetUser())
         this.store.dispatch(unSetItems())
@@ -51,7 +51,7 @@ export class AuthService {
     return this.auth.createUserWithEmailAndPassword(email, password)
       .then(({ user }) => {
 
-        const newUser = new Usuario(user.uid, nombre, user.email)
+        const newUser = new Usuario(user.uid, nombre, user.email, 0, 0, false)
 
         return this.firestore.doc(`${user.uid}/usuario`).set({ ...newUser })
 
