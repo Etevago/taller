@@ -5,7 +5,7 @@ import { IngresoEgresoService } from './../services/ingreso-egreso.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, find, map } from 'rxjs/operators';
 import { AppState } from '../app.reducer';
 
 @Component({
@@ -33,7 +33,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         filter(auth => auth.user != null)
       )
       .subscribe(
-        ({ user }) => this.ingresosSubs = this.ies.initIngresoEgresoListener(user.uid)
+        ({ user }) => this.ingresosSubs = this.ies.initIngresoEgresoListener(user?.uid)
           .subscribe((ingresosEgresosFB: any) => {
             this.store.dispatch(setItems({ items: ingresosEgresosFB }))
           })
@@ -44,10 +44,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       this.segundosActuales = new Date().getTime()
       this.store.select("user").subscribe(params => {
-        this.segundosFB = params.user.tiempo
+        this.segundosFB = params.user?.tiempo
       })
       this.store.select("user").subscribe(params => {
-        this.contador = params.user.contador
+        this.contador = params.user?.contador
       })
 
       const diferencia = (this.segundosActuales - this.segundosFB) / 1000
@@ -56,7 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
 
       this.store.select("user").subscribe(params => {
-        this.reparando = params.user.reparando
+        this.reparando = params.user?.reparando
       })
 
       if (this.reparando) {
@@ -68,19 +68,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
         })
 
 
-        setInterval(() => {
-          if (this.contador >= 100) {
-            this.ds.stopReparacion();
-            return;
-          }
-          else if (this.parar) {
-            return;
-          }
-          console.log("sumando dashboard");
-          this.store.dispatch(contador())
-        }, 1000)
+        if (this.reparando) {
+          const intervalo = setInterval(() => {
+
+            this.store.select("contador").subscribe(params => {
+              this.parar = params.parar
+            })
+            if (this.contador >= 100) {
+              this.ds.reparacionCompleta()
+              this.ds.stopReparacion();
+              clearInterval(intervalo);
+              ;
+            }
+            else if (this.parar) {
+              this.ds.stopReparacion();
+              clearInterval(intervalo);
+              ;
+            }
+            console.log("sumando dashboard");
+            this.store.dispatch(contador())
+          }, 1000)
+        }
 
       }
+      this.store.select("user").subscribe(({ user }) => {
+        if (user.contador == 100) {
+          this.store.dispatch(setContador({actual:100}))
+        }
+      })
     }, 1000);
 
 

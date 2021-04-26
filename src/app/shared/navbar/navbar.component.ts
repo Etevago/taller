@@ -7,6 +7,11 @@ import { AppState } from 'src/app/app.reducer';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styles: [
+    `
+    .titulo{
+      font-family:"Copperplate"
+    }
+    `
   ]
 })
 export class NavbarComponent implements OnInit, OnDestroy {

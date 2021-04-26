@@ -34,6 +34,13 @@ export class DashboardService {
 
   }
 
+  reparacionCompleta() {
+    const uid = this.authService.user.uid
+
+    this.firestore.doc(`${uid}/usuario`).update({ contador: 100 })
+
+  }
+
   stopReparacion() {
     const uid = this.authService.user.uid
 

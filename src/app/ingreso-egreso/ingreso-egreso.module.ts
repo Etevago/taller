@@ -12,6 +12,17 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { ingresoEgresoReducer } from './ingreso-egreso.reducer';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { NgxPayPalModule } from 'ngx-paypal';
+import {  FullCalendarModule } from '@fullcalendar/angular'; // the main connector. must go first
+import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin
+import interactionPlugin from '@fullcalendar/interaction'; // a plugin
+
+FullCalendarModule.registerPlugins([ // register FullCalendar plugins
+  dayGridPlugin,
+  interactionPlugin
+]);
+
+
 
 @NgModule({
   declarations: [
@@ -27,8 +38,10 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     SharedModule,
     DashboardRoutesModule,
     StoreModule.forFeature("ingresosEgresos", ingresoEgresoReducer),
-    MatProgressBarModule
-
+    MatProgressBarModule,
+    NgxPayPalModule,
+    FullCalendarModule ,
+    
 
   ],
   exports: [

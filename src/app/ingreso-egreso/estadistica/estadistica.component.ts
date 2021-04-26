@@ -61,14 +61,20 @@ export class EstadisticaComponent implements OnInit {
     this.store.select("contador").subscribe(params => {
       this.parar = params.parar
     })
-    setInterval(() => {
+
+    const intervalo = setInterval(() => {
+      console.log(this.contador);
+
       if (this.contador >= 100) {
+        this.ds.reparacionCompleta()
         this.ds.stopReparacion();
-        return;
+        clearInterval(intervalo);
       }
       else if (this.parar) {
-        return;
+        this.ds.stopReparacion();
+        clearInterval(intervalo);
       }
+
       console.log("sumando funcion");
       this.store.dispatch(contador())
     }, 1000)
