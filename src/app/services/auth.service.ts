@@ -1,4 +1,3 @@
-import { unSetItems } from './../ingreso-egreso/ingreso-egreso.actions';
 import * as auth from './../auth/auth.actions';
 import { Usuario } from './../models/usuario.model';
 import { Injectable, OnDestroy } from '@angular/core';
@@ -36,7 +35,6 @@ export class AuthService {
         this.userSub?.unsubscribe()
         this._user = null;
         this.store.dispatch(auth.unSetUser())
-        this.store.dispatch(unSetItems())
       }
     })
   }

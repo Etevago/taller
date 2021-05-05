@@ -5,7 +5,9 @@ import { Routes } from "@angular/router";
 
 
 export const dashboardRoutes: Routes = [
-    { path: '', component: EstadisticaComponent  },
-    { path: 'ingreso-egreso', component:IngresoEgresoComponent },
-    { path: 'detalle', component:DetalleComponent },
+    { path: 'estadistica', component: EstadisticaComponent },
+    { path: 'ingreso-egreso', component: IngresoEgresoComponent },
+    { path: 'detalle', component: DetalleComponent },
+    { path: '', redirectTo: "estadistica" },
+
 ]

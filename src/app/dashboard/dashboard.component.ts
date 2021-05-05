@@ -1,11 +1,11 @@
+import { setItems } from './items.actions';
+import { CalendarService } from './../services/calendar.service';
 import { setContador, reparar, contador, stopReparar, startContador } from './../ingreso-egreso/estadistica/estadistica.actions';
 import { DashboardService } from './dashboard.service';
-import { setItems } from './../ingreso-egreso/ingreso-egreso.actions';
-import { IngresoEgresoService } from './../services/ingreso-egreso.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
-import { filter, find, map } from 'rxjs/operators';
+import { Subscription, Subject } from 'rxjs';
+import { filter, find, map, takeUntil } from 'rxjs/operators';
 import { AppState } from '../app.reducer';
 
 @Component({
@@ -15,29 +15,34 @@ import { AppState } from '../app.reducer';
   ]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  private unsubscribe: Subject<void> = new Subject();
 
-  sub: Subscription;
-  ingresosSubs: Subscription;
   segundosActuales: number;
   segundosFB: number;
   contador: number;
   reparando: boolean;
   parar: boolean;
+  calendarSubs: Subscription;
 
-  constructor(private store: Store<AppState>, private ies: IngresoEgresoService, private ds: DashboardService) { }
+  constructor(private store: Store<AppState>, private ds: DashboardService, private calendarS: CalendarService) { }
 
   ngOnInit(): void {
 
-    this.sub = this.store.select("user")
+    this.store.select("user")
       .pipe(
+        takeUntil(this.unsubscribe),
         filter(auth => auth.user != null)
       )
       .subscribe(
-        ({ user }) => this.ingresosSubs = this.ies.initIngresoEgresoListener(user?.uid)
+        ({ user }) => this.calendarSubs = this.calendarS.initCalendarListener(user.uid)
           .subscribe((ingresosEgresosFB: any) => {
             this.store.dispatch(setItems({ items: ingresosEgresosFB }))
           })
-      );
+      )
+
+
+
+
     setTimeout(() => {
 
       this.store.dispatch(startContador())
@@ -93,7 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this.store.select("user").subscribe(({ user }) => {
         if (user.contador == 100) {
-          this.store.dispatch(setContador({actual:100}))
+          this.store.dispatch(setContador({ actual: 100 }))
         }
       })
     }, 1000);
@@ -102,8 +107,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.sub?.unsubscribe()
-    this.ingresosSubs?.unsubscribe()
+
+    this.unsubscribe.next()
+    this.unsubscribe.complete()
   }
 
 

@@ -1,4 +1,5 @@
-import { Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Subscription, Subject } from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.reducer';
@@ -15,18 +16,21 @@ import { AppState } from 'src/app/app.reducer';
   ]
 })
 export class NavbarComponent implements OnInit, OnDestroy {
+  private unsubscribe: Subject<void> = new Subject();
+
   nombre: string;
-  userSub: Subscription;
   constructor(private store: Store<AppState>) { }
 
   ngOnInit(): void {
 
-    this.userSub = this.store.select("user")
+    this.store.select("user")
+      .pipe(takeUntil(this.unsubscribe))
       .subscribe(({ user }) => this.nombre = user?.nombre);
   }
 
   ngOnDestroy() {
-    this.userSub.unsubscribe()
+    this.unsubscribe.next()
+    this.unsubscribe.complete()
   }
 
 }

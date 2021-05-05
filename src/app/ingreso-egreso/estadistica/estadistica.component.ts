@@ -1,5 +1,5 @@
+import { AppState } from './../../app.reducer';
 import { DashboardService } from './../../dashboard/dashboard.service';
-import { AppStateIngreso } from './../ingreso-egreso.reducer';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { IngresoEgreso } from 'src/app/models/ingreso-egreso.model';
@@ -27,34 +27,23 @@ export class EstadisticaComponent implements OnInit {
   parar: boolean;
 
 
-  constructor(private store: Store<AppStateIngreso>, private ds: DashboardService) {
+  constructor(private store: Store<AppState>, private ds: DashboardService) {
   }
 
   ngOnInit(): void {
 
-    this.store.select("ingresosEgresos").subscribe(({ items }: any) => {
-      this.generarEstadistica(items)
-    })
 
-    this.store.select("contador").subscribe(({ cont }) => {
-      this.contador = cont;
-    })
+     this.store.select("contador").subscribe(({ cont }) => {
+       this.contador = cont;
+     })
 
-  }
-
-  generarEstadistica(items: (IngresoEgreso[] | any)) {
-    for (const item of items) {
-      if (item.data.tipo === "ingreso") {
-        this.totalIngresos += item.data.cantidad
-        this.ingresos++;
-      } else {
-        this.totalEgresos += item.data.cantidad
-        this.egresos++;
-      }
-    }
-    this.total = this.totalIngresos - this.totalEgresos
+    // this.store.select("user").subscribe(({ user }) => {
+    //   this.contador = user.contador
+    // })
 
   }
+
+
 
   reparar() {
     this.ds.crearReparacion()

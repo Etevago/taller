@@ -1,3 +1,4 @@
+import { Fecha } from './../models/fecha.model';
 import { Injectable } from '@angular/core';
 
 import 'firebase/firestore';
@@ -15,26 +16,26 @@ export class CalendarService {
   constructor(private firestore: AngularFirestore,
     private authService: AuthService) { }
 
-  crearFecha(fecha) {
+  crearFecha(fecha: Fecha) {
     const uid = this.authService.user.uid;
 
-    delete fecha.uid;
 
-    return this.firestore.doc(`${uid}/usuario`)
-      .collection('calendar')
+    return this.firestore.doc(`${uid}/calendar`)
+      .collection("items")
       .add({ ...fecha });
 
   }
 
-  borrarFecha(uidFecha: string) {
+  borrarFecha(idFecha: string) {
     const uid = this.authService.user.uid;
-    return this.firestore.doc(`${uid}/usuario/calendar/${uidFecha}`)
+    this.firestore.doc(`${uid}/calendar/items/${idFecha}`)
       .delete()
+
   }
 
 
   initCalendarListener(uid: string) {
-    return this.firestore.collection(`${uid}/usuario/calendar`)
+    return this.firestore.collection(`${uid}/calendar/items`)
       .snapshotChanges()
       .pipe(
         map(snapshot => {

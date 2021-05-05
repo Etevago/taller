@@ -1,42 +1,26 @@
-<!-- <div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-
-                <h4 class="card-title">Detalle de ingreso egreso</h4>
-
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Cantidad</th>
-                            <th>Tipo</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr *ngFor="let item of ingresosEgresos | ordenIngreso">
-                            <td>{{item.data.descripcion}}</td>
-                            <td>{{item.data.cantidad | currency:'EUR'}}</td>
-                            <td [ngClass]="{'text-danger': item.data.tipo==='egreso', 'text-success':item.data.tipo==='ingreso'}">{{item.data.tipo}}</td>
-                            <td><button (click)="borrar(item.uid)" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Borrar</button></td>
-                        </tr>
-                    </tbody>
-
-                </table>
-
-
-            </div>
-        </div>
-    </div>
-</div> -->
-
-
-
-
-
 <div class='demo-app'>
+
+
+    <h3>Elige tu reparación</h3>
+    <mat-form-field appearance="fill">
+        <mat-label>Opcion</mat-label>
+        <mat-select [formControl]="opcionControl" multiple [(value)]="selected">
+            <mat-optgroup *ngFor="let group of opcionGroups" [label]="group.name" [disabled]="group.disabled">
+                <img with="30" height="30" [src]="group.image">
+                <mat-option *ngFor="let opcion of group.opcion" [value]="opcion">
+                    {{opcion.value | select}}
+                </mat-option>
+            </mat-optgroup>
+        </mat-select>
+    </mat-form-field>
+
+    <h4>Ha elegido las siguientes reparaciones:</h4>
+    <ul>
+        <li *ngFor="let opcion of selected">{{opcion.value | select}}: {{opcion.price}}€</li>
+    </ul>
+
+    <button class="btn btn-primary" [disabled]="selected.length===0" (click)="confirmar()">Confirmar cita</button>
+
 
     <div class='demo-app-sidebar'>
         <div class='demo-app-sidebar-section'>

@@ -1,10 +1,11 @@
+import { takeUntil } from 'rxjs/operators';
 import * as ui from './../../shared/ui.actions';
 import { AuthService } from './../../services/auth.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.reducer';
 
@@ -15,10 +16,10 @@ import { AppState } from 'src/app/app.reducer';
   ]
 })
 export class RegisterComponent implements OnInit, OnDestroy {
+  private unsubscribe: Subject<void> = new Subject();
 
   registro: FormGroup;
   loading: boolean = false;
-  uiSub: Subscription;
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private store: Store<AppState>) { }
 
@@ -29,15 +30,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
       password: ["", Validators.required],
     })
 
-    this.uiSub = this.store.select("ui").subscribe(ui =>
-      this.loading = ui.isLoading)
+    this.store.select("ui")
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(ui =>
+        this.loading = ui.isLoading)
   }
 
 
 
 
   ngOnDestroy() {
-    this.uiSub?.unsubscribe()
+    this.unsubscribe.next()
+    this.unsubscribe.complete()
   }
 
   crearUsuario() {
