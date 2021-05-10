@@ -37,11 +37,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ({ user }) => this.calendarSubs = this.calendarS.initCalendarListener(user.uid)
           .subscribe((ingresosEgresosFB: any) => {
             this.store.dispatch(setItems({ items: ingresosEgresosFB }))
+           
           })
       )
-
-
-
 
     setTimeout(() => {
 

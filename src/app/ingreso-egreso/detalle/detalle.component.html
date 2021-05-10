@@ -1,56 +1,31 @@
 <div class='demo-app'>
 
+    <div>
+        <h3>Elige tu reparación</h3>
+        <mat-form-field appearance="fill">
+            <mat-label>Opcion</mat-label>
+            <mat-select [formControl]="opcionControl" multiple [(value)]="selected">
+                <mat-optgroup *ngFor="let group of opcionGroups" [label]="group.name" [disabled]="group.disabled">
+                    <img with="30" height="30" [src]="group.image">
+                    <mat-option *ngFor="let opcion of group.opcion" [value]="opcion">
+                        {{opcion.value | select}}
+                    </mat-option>
+                </mat-optgroup>
+            </mat-select>
+        </mat-form-field>
 
-    <h3>Elige tu reparación</h3>
-    <mat-form-field appearance="fill">
-        <mat-label>Opcion</mat-label>
-        <mat-select [formControl]="opcionControl" multiple [(value)]="selected">
-            <mat-optgroup *ngFor="let group of opcionGroups" [label]="group.name" [disabled]="group.disabled">
-                <img with="30" height="30" [src]="group.image">
-                <mat-option *ngFor="let opcion of group.opcion" [value]="opcion">
-                    {{opcion.value | select}}
-                </mat-option>
-            </mat-optgroup>
-        </mat-select>
-    </mat-form-field>
+        <h3>Ha elegido las siguientes reparaciones:</h3>
+        <ul>
+            <li *ngFor="let opcion of selected">{{opcion.value | select}}: {{opcion.price}}€</li>
+        </ul>
 
-    <h4>Ha elegido las siguientes reparaciones:</h4>
-    <ul>
-        <li *ngFor="let opcion of selected">{{opcion.value | select}}: {{opcion.price}}€</li>
-    </ul>
+        <h4>pago total: {{pagoTotal}}€</h4>
 
-    <button class="btn btn-primary" [disabled]="selected.length===0" (click)="confirmar()">Confirmar cita</button>
-
+        <button class="btn btn-primary" [disabled]="selected.length===0" (click)="confirmar()">Confirmar cita</button>
+    </div>
 
     <div class='demo-app-sidebar'>
-        <div class='demo-app-sidebar-section'>
-            <h2>Instructions</h2>
-            <ul>
-                <li>Select dates and you will be prompted to create a new event</li>
-                <li>Drag, drop, and resize events</li>
-                <li>Click an event to delete it</li>
-            </ul>
-        </div>
-        <div class='demo-app-sidebar-section'>
-            <label>
-          <input
-            type='checkbox'
-            [checked]='calendarVisible'
-            (change)='handleCalendarToggle()'
-          />
-          toggle whole calendar
-        </label>
-        </div>
-        <div class='demo-app-sidebar-section'>
-            <label>
-          <input
-            type='checkbox'
-            [checked]='calendarOptions.weekends'
-            (change)='handleWeekendsToggle()'
-          />
-          toggle weekends
-        </label>
-        </div>
+
         <div class='demo-app-sidebar-section'>
             <h2>All Events ({{currentEvents.length}})</h2>
             <ul>
@@ -63,7 +38,7 @@
     </div>
 
     <div class='demo-app-main'>
-        <full-calendar *ngIf='calendarVisible' [options]='calendarOptions'></full-calendar>
+        <full-calendar *ngIf='pagoTotal' [options]='calendarOptions'></full-calendar>
     </div>
 
 </div>

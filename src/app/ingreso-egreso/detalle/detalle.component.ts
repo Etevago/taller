@@ -1,3 +1,4 @@
+import { setReparaciones } from './../estadistica/estadistica.actions';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AppState } from './../../app.reducer';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -38,18 +39,33 @@ export class DetalleComponent implements OnInit, OnDestroy {
   coleccion;
   currentEvents: EventApi[] = [];
   iniciales = [];
-  selected = []
-
-
-
+  selected: any[] = []
+  arrayItems = []
+  itemId: string
   constructor(private store: Store<AppState>, private calendarS: CalendarService, private firestore: AngularFirestore) { }
 
   ngOnInit(): void {
-
     this.store.select("user")
+      .pipe(takeUntil(this.unsubscribe))
       .subscribe(({ user }) => {
         this.nombre = user?.nombre
         this.uid = user?.uid
+
+      });
+
+    this.store.select("items")
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(({ items }) => {
+        items.forEach(item => {
+          this.arrayItems.push(item)
+        });
+      })
+
+    this.store.select("contador")
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((res) => {
+        this.pagoTotal = res.pago
+        if (res.reparaciones.length > 0) this.selected = res.reparaciones
       });
   }
 
@@ -101,9 +117,23 @@ export class DetalleComponent implements OnInit, OnDestroy {
     this.calendarVisible = !this.calendarVisible;
   }
 
-  createEventId() {
-    return String(Math.floor(Math.random() * 999999999));
+  getEventId(title: string): string {
+    let a: Promise<any>
+    let o = ""
+    setTimeout(() => {
+      for (let i = 0; i < this.arrayItems.length; i++) {
+        console.log("ARRAY: " + this.arrayItems[i].data.title);
+        console.log("ORIGINAL:" + title);
+        if (this.arrayItems[i].data.title === title) {
+          console.log("dentro");
+          a.then(o = this.arrayItems[i].uid)
+        }
+      }
+    }, 100);
+    return "3soKIgaY4iKcF2VIZMgo"
   }
+
+
 
   handleWeekendsToggle() {
     const { calendarOptions } = this;
@@ -111,15 +141,14 @@ export class DetalleComponent implements OnInit, OnDestroy {
   }
 
   handleDateSelect(selectInfo: DateSelectArg) {
-    const title = "Reparación " + this.nombre
-
+    const title = "Reparación " + this.nombre + Math.random() * 9999999
+    this.getEventId(title)
     const calendarApi = selectInfo.view.calendar;
 
     calendarApi.unselect(); // clear date selection
 
     if (title) {
       this.calendarS.crearFecha({
-        id: this.createEventId(),
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
@@ -127,7 +156,7 @@ export class DetalleComponent implements OnInit, OnDestroy {
       });
 
       calendarApi.addEvent({
-        id: this.createEventId(),
+        id: "EUVA1JVNJMRn3i8SK3tm",
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
@@ -140,7 +169,7 @@ export class DetalleComponent implements OnInit, OnDestroy {
     if (confirm(`¿Seguro que quieres eliminar tu cita? '${clickInfo.event.title}'`)) {
       clickInfo.event.remove();
       console.log(clickInfo);
-      // console.log(this.calendarS.borrarFecha())
+      this.calendarS.borrarFecha(clickInfo.event.id)
     }
   }
 
@@ -153,7 +182,9 @@ export class DetalleComponent implements OnInit, OnDestroy {
       this.pagoTotal += opcion.price
     });
     this.store.dispatch(setPago({ pago: this.pagoTotal }))
+    this.store.dispatch(setReparaciones({ reparaciones: this.selected }))
   }
+
 
   opcionControl = new FormControl();
   opcionGroups: OpcionGroup[] = [

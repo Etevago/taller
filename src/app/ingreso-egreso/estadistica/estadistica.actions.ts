@@ -7,3 +7,4 @@ export const setContador = createAction('[Contador] Establecer Contador', props<
 export const reparar = createAction('[Contador] Empezar Reparar');
 export const stopReparar = createAction('[Contador] Parar Reparar');
 export const setPago = createAction('[Pago] Establecer Pago', props<{ pago: number }>());
+export const setReparaciones = createAction('[Reparaciones] Establecer Reparaciones', props<{ reparaciones: any[] }>());

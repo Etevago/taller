@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 
 import 'firebase/firestore';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { IngresoEgreso } from '../models/ingreso-egreso.model';
 import { AuthService } from './auth.service';
 
 import { map } from 'rxjs/operators';
@@ -13,12 +12,13 @@ import { map } from 'rxjs/operators';
 })
 export class CalendarService {
 
+  uid: string
+
   constructor(private firestore: AngularFirestore,
     private authService: AuthService) { }
 
   crearFecha(fecha: Fecha) {
     const uid = this.authService.user.uid;
-
 
     return this.firestore.doc(`${uid}/calendar`)
       .collection("items")
@@ -32,7 +32,6 @@ export class CalendarService {
       .delete()
 
   }
-
 
   initCalendarListener(uid: string) {
     return this.firestore.collection(`${uid}/calendar/items`)

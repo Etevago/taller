@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago } from './estadistica.actions';
+import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago, setReparaciones } from './estadistica.actions';
 
 export interface State {
     cont: number
@@ -7,6 +7,7 @@ export interface State {
     reparando: boolean
     parar: boolean
     pago: number
+    reparaciones: any[]
 }
 
 export const initialState: State = {
@@ -14,7 +15,8 @@ export const initialState: State = {
     user: "",
     reparando: false,
     parar: false,
-    pago: 0
+    pago: 0,
+    reparaciones: []
 }
 
 const _contadorReducer = createReducer(initialState,
@@ -26,6 +28,7 @@ const _contadorReducer = createReducer(initialState,
     on(reparar, state => ({ ...state, reparando: true })),
     on(stopReparar, state => ({ ...state, reparando: false })),
     on(setPago, (state, { pago }) => ({ ...state, pago: pago })),
+    on(setReparaciones, (state, { reparaciones }) => ({ ...state, reparaciones: [...reparaciones] })),
 
 
 
