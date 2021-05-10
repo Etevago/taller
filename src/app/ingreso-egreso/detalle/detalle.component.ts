@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { setReparaciones } from './../estadistica/estadistica.actions';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AppState } from './../../app.reducer';
@@ -34,6 +35,8 @@ export class DetalleComponent implements OnInit, OnDestroy {
   private unsubscribe: Subject<void> = new Subject();
 
   pagoTotal = 0;
+  suma = 0;
+  cita = false;
   nombre: string;
   uid: string;
   coleccion;
@@ -45,12 +48,16 @@ export class DetalleComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>, private calendarS: CalendarService, private firestore: AngularFirestore) { }
 
   ngOnInit(): void {
+
+    this.selected.forEach(option => {
+      this.suma += option.price
+    });
+
     this.store.select("user")
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(({ user }) => {
         this.nombre = user?.nombre
         this.uid = user?.uid
-
       });
 
     this.store.select("items")
@@ -84,6 +91,40 @@ export class DetalleComponent implements OnInit, OnDestroy {
           this.calendarOptions.events = this.iniciales
         })
     )
+
+  confirmar() {
+    let suma = 0;
+    this.selected.forEach((opcion: Opcion) => {
+      suma += opcion.price
+    });
+
+    Swal.fire({
+      title: 'Pago total: ' + suma + "€",
+      text: "¿Quiéres confirmar tu cita?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Continuar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Deleted!',
+          'Your file has been deleted.',
+          'success'
+        )
+        this.selected.forEach((opcion: Opcion) => {
+          this.pagoTotal += opcion.price
+        });
+        this.cita = true;
+        this.store.dispatch(setPago({ pago: this.pagoTotal }))
+        this.store.dispatch(setReparaciones({ reparaciones: this.selected }))
+      }
+    })
+
+
+  }
+
 
   calendarVisible = true;
   calendarOptions: CalendarOptions = {
@@ -177,13 +218,6 @@ export class DetalleComponent implements OnInit, OnDestroy {
     this.currentEvents = events;
   }
 
-  confirmar() {
-    this.selected.forEach((opcion: Opcion) => {
-      this.pagoTotal += opcion.price
-    });
-    this.store.dispatch(setPago({ pago: this.pagoTotal }))
-    this.store.dispatch(setReparaciones({ reparaciones: this.selected }))
-  }
 
 
   opcionControl = new FormControl();

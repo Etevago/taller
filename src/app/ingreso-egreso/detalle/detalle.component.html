@@ -1,6 +1,6 @@
 <div class='demo-app'>
 
-    <div>
+    <div *ngIf="!cita">
         <h3>Elige tu reparación</h3>
         <mat-form-field appearance="fill">
             <mat-label>Opcion</mat-label>
@@ -19,15 +19,12 @@
             <li *ngFor="let opcion of selected">{{opcion.value | select}}: {{opcion.price}}€</li>
         </ul>
 
-        <h4>pago total: {{pagoTotal}}€</h4>
-
         <button class="btn btn-primary" [disabled]="selected.length===0" (click)="confirmar()">Confirmar cita</button>
     </div>
 
     <div class='demo-app-sidebar'>
 
         <div class='demo-app-sidebar-section'>
-            <h2>All Events ({{currentEvents.length}})</h2>
             <ul>
                 <li *ngFor='let event of currentEvents'>
                     <b>{{event.startStr}}</b>
@@ -38,7 +35,7 @@
     </div>
 
     <div class='demo-app-main'>
-        <full-calendar *ngIf='pagoTotal' [options]='calendarOptions'></full-calendar>
+        <full-calendar *ngIf='cita' [options]='calendarOptions'></full-calendar>
     </div>
 
 </div>
