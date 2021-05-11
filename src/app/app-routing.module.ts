@@ -8,7 +8,7 @@ const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     {
-        path: "", canLoad: [AuthGuard], loadChildren: () => import('./ingreso-egreso/ingreso-egreso.module').then(m => m.IngresoEgresoModule)
+        path: "", canLoad: [AuthGuard], loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule)
     },
     { path: '**', redirectTo: "" },
 ]

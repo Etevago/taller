@@ -1,22 +1,18 @@
-import { AppState } from './../../app.reducer';
-import { DashboardService } from './../../dashboard/dashboard.service';
+import { AppState } from '../../app.reducer';
+import { DashboardService } from '../../dashboard/dashboard.service';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { IngresoEgreso } from 'src/app/models/ingreso-egreso.model';
-import { contadorReducer } from './estadistica.reducer';
-import { contador } from './estadistica.actions';
-import { takeUntil } from 'rxjs/operators';
-import { interval, timer } from 'rxjs';
+import { contador } from './progreso.actions';
 
 
 @Component({
   selector: 'app-estadistica',
-  templateUrl: './estadistica.component.html',
+  templateUrl: './progreso.component.html',
   styles: [
 
   ]
 })
-export class EstadisticaComponent implements OnInit {
+export class ProgresoComponent implements OnInit {
 
   ingresos: number = 0;
   egresos: number = 0;

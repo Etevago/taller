@@ -1,5 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
-import { Subscription, Subject } from 'rxjs';
+import {  Subject } from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.reducer';

@@ -1,16 +1,16 @@
 import Swal from 'sweetalert2';
-import { setReparaciones } from './../estadistica/estadistica.actions';
+import { setReparaciones } from '../progreso/progreso.actions';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { AppState } from './../../app.reducer';
+import { AppState } from '../../app.reducer';
 import { filter, takeUntil } from 'rxjs/operators';
-import { CalendarService } from './../../services/calendar.service';
+import { CalendarService } from '../../services/calendar.service';
 import { Subject } from 'rxjs';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
 import esLocale from '@fullcalendar/core/locales/es';
 import { FormControl } from '@angular/forms';
-import { setPago } from '../estadistica/estadistica.actions';
+import { setPago } from '../progreso/progreso.actions';
 
 interface Opcion {
   value: string;
@@ -25,12 +25,12 @@ interface OpcionGroup {
 }
 
 @Component({
-  selector: 'app-detalle',
-  templateUrl: './detalle.component.html',
+  selector: 'app-citas',
+  templateUrl: './citas.component.html',
   styles: [
   ]
 })
-export class DetalleComponent implements OnInit, OnDestroy {
+export class CitasComponent implements OnInit, OnDestroy {
 
   private unsubscribe: Subject<void> = new Subject();
 
@@ -94,12 +94,14 @@ export class DetalleComponent implements OnInit, OnDestroy {
 
   confirmar() {
     let suma = 0;
+    let sumaFinal = "";
     this.selected.forEach((opcion: Opcion) => {
       suma += opcion.price
     });
-
+    // sumaFinal = Math.round(suma * 1e3) / 1e3
+    sumaFinal = suma.toFixed(2)
     Swal.fire({
-      title: 'Pago total: ' + suma + "€",
+      title: 'Pago total: ' + sumaFinal + "€",
       text: "¿Quiéres confirmar tu cita?",
       icon: 'warning',
       showCancelButton: true,
@@ -109,15 +111,18 @@ export class DetalleComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire(
-          'Deleted!',
-          'Your file has been deleted.',
+          'Éxito',
+          'Tu cita se ha confirmado',
           'success'
         )
         this.selected.forEach((opcion: Opcion) => {
           this.pagoTotal += opcion.price
         });
+        let pagoFinal = 0;
+        pagoFinal = Math.round(this.pagoTotal * 1e2) / 1e2
+
         this.cita = true;
-        this.store.dispatch(setPago({ pago: this.pagoTotal }))
+        this.store.dispatch(setPago({ pago: pagoFinal }))
         this.store.dispatch(setReparaciones({ reparaciones: this.selected }))
       }
     })

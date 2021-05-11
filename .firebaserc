@@ -2,8 +2,15 @@
   "targets": {
     "crud-6814c": {
       "hosting": {
-        "ingresoEgresoApp": [
+        "taller": [
           "crud-6814c"
+        ]
+      }
+    },
+    "taller-e2955": {
+      "hosting": {
+        "taller": [
+          "taller-e2955"
         ]
       }
     }

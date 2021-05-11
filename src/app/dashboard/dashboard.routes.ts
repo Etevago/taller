@@ -1,13 +1,13 @@
-import { DetalleComponent } from './../ingreso-egreso/detalle/detalle.component';
-import { IngresoEgresoComponent } from './../ingreso-egreso/ingreso-egreso.component';
-import { EstadisticaComponent } from './../ingreso-egreso/estadistica/estadistica.component';
+import { ProgresoComponent } from './../pages/progreso/progreso.component';
+import { PagoComponent } from './../pages/pago/pago.component';
+import { CitasComponent } from './../pages/citas/citas.component';
 import { Routes } from "@angular/router";
 
 
 export const dashboardRoutes: Routes = [
-    { path: 'estadistica', component: EstadisticaComponent },
-    { path: 'ingreso-egreso', component: IngresoEgresoComponent },
-    { path: 'detalle', component: DetalleComponent },
-    { path: '', redirectTo: "estadistica" },
+    { path: 'citas', component: CitasComponent },
+    { path: 'pago', component: PagoComponent },
+    { path: 'progreso', component: ProgresoComponent },
+    { path: '', redirectTo: "citas" },
 
 ]

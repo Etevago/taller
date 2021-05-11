@@ -1,4 +1,4 @@
-import { stopContador, setContador } from './../../ingreso-egreso/estadistica/estadistica.actions';
+import { stopContador, setContador } from './../../pages/progreso/progreso.actions';
 import { DashboardService } from './../../dashboard/dashboard.service';
 import { map, takeUntil } from 'rxjs/operators';
 import { AuthService } from './../../services/auth.service';

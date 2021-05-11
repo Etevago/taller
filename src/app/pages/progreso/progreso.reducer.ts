@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago, setReparaciones } from './estadistica.actions';
+import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago, setReparaciones } from './progreso.actions';
 
 export interface State {
     cont: number

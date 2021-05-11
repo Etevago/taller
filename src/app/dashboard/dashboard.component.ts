@@ -1,11 +1,11 @@
 import { setItems } from './items.actions';
 import { CalendarService } from './../services/calendar.service';
-import { setContador, reparar, contador, stopReparar, startContador } from './../ingreso-egreso/estadistica/estadistica.actions';
+import { setContador, reparar, contador, startContador } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription, Subject } from 'rxjs';
-import { filter, find, map, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { AppState } from '../app.reducer';
 
 @Component({
@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ({ user }) => this.calendarSubs = this.calendarS.initCalendarListener(user.uid)
           .subscribe((ingresosEgresosFB: any) => {
             this.store.dispatch(setItems({ items: ingresosEgresosFB }))
-           
+
           })
       )
 

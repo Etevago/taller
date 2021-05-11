@@ -1,4 +1,4 @@
-import { reparar, stopReparar } from './../ingreso-egreso/estadistica/estadistica.actions';
+import { reparar, stopReparar } from './../pages/progreso/progreso.actions';
 import { AppState } from 'src/app/app.reducer';
 import { Store } from '@ngrx/store';
 import { AuthService } from './../services/auth.service';

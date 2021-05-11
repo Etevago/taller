@@ -1,24 +1,19 @@
 import { takeUntil } from 'rxjs/operators';
-import { isLoading, stopLoading } from './../shared/ui.actions';
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { IngresoEgreso } from '../models/ingreso-egreso.model';
-import Swal from 'sweetalert2';
 import { IPayPalConfig, ICreateOrderRequest } from 'ngx-paypal';
-
 import { Store } from '@ngrx/store';
-import { AppState } from '../app.reducer';
-import * as ui from '../shared/ui.actions';
 import { Subscription, Subject } from 'rxjs';
+import { AppState } from 'src/app/app.reducer';
 
 
 
 @Component({
-  selector: 'app-ingreso-egreso',
-  templateUrl: './ingreso-egreso.component.html',
+  selector: 'app-pago',
+  templateUrl: './pago.component.html',
   styles: []
 })
-export class IngresoEgresoComponent implements OnInit, OnDestroy {
+export class PagoComponent implements OnInit, OnDestroy {
   private unsubscribe: Subject<void> = new Subject();
 
   ingresoForm: FormGroup;
@@ -52,7 +47,7 @@ export class IngresoEgresoComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(({ pago }) => this.pagoTotal = pago);
 
-    this.pago = this.pagoTotal.toString()
+    this.pago = this.pagoTotal.toFixed(2).toString()
   }
 
   ngOnDestroy() {
