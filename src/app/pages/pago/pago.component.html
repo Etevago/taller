@@ -2,9 +2,16 @@
 
     <h2>Puedes pagar on-line o en nuestro taller</h2>
     <br>
-    <h3>El pago total es de {{pagoTotal}}€</h3>
+    <div *ngIf="pagoTotal">
+        <h3>El pago total es de {{pagoTotal}}€</h3>
 
-    <ngx-paypal [config]="payPalConfig"></ngx-paypal>
-
+        <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+    </div>
+    <div *ngIf="!pagoTotal">
+        <h3>No tienes ninguna cita pendiente de pago</h3>
+        <a routerLink="citas">
+            <h4>Puedes pedir cita aquí</h4>
+        </a>
+    </div>
 
 </div>

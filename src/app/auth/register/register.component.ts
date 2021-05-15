@@ -2,10 +2,10 @@ import { takeUntil } from 'rxjs/operators';
 import * as ui from './../../shared/ui.actions';
 import { AuthService } from './../../services/auth.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { Subscription, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.reducer';
 
@@ -27,7 +27,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.registro = this.fb.group({
       nombre: ["", Validators.required],
       email: ["", [Validators.required, Validators.email]],
-      password: ["", Validators.required],
+      pass1: ["", [Validators.required, Validators.minLength(6)]],
+      pass2: ["", [Validators.required, Validators.minLength(6)]],
     })
 
     this.store.select("ui")
@@ -36,12 +37,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
         this.loading = ui.isLoading)
   }
 
+  get nombreNoValido() {
+    return this.registro.get('nombre').invalid && this.registro.get('nombre').touched
+  }
 
+  get emailNoValido() {
+    return this.registro.get('email').invalid && this.registro.get('email').touched
+  }
 
+  get pass1NoValido() {
+    return this.registro.get('pass1').invalid && this.registro.get('pass1').touched
+  }
 
-  ngOnDestroy() {
-    this.unsubscribe.next()
-    this.unsubscribe.complete()
+  get pass2NoValido() {
+    const pass1 = this.registro.get("pass1").value;
+    const pass2 = this.registro.get("pass2").value;
+    return ((pass1 === pass2) && pass1.length >=6 && this.registro.get('pass1').touched && this.registro.get('pass2').touched) ? false : true;
   }
 
   crearUsuario() {
@@ -49,17 +60,17 @@ export class RegisterComponent implements OnInit, OnDestroy {
       return
     }
     this.store.dispatch(ui.isLoading())
-    // Swal.fire({
-    //   title: 'Espere por favor',
-    //   didOpen: () => {
-    //     Swal.showLoading()
-    //   }
-    // })
+    Swal.fire({
+      title: 'Espere por favor',
+      didOpen: () => {
+        Swal.showLoading()
+      }
+    })
 
     const { nombre, email, password } = this.registro.value
     this.auth.crearUsuario(nombre, email, password)
-      .then(params => {
-        // Swal.close()
+      .then(() => {
+        Swal.close()
         this.store.dispatch(ui.stopLoading())
         this.router.navigate(["/"])
       })
@@ -72,6 +83,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
           text: error.message,
         })
       })
+  }
+
+  estilos() {
+    return `
+      border-color:green;
+      border-width:3px;
+    `
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe.next()
+    this.unsubscribe.complete()
   }
 
 }

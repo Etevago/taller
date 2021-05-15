@@ -8,3 +8,5 @@ export const reparar = createAction('[Contador] Empezar Reparar');
 export const stopReparar = createAction('[Contador] Parar Reparar');
 export const setPago = createAction('[Pago] Establecer Pago', props<{ pago: number }>());
 export const setReparaciones = createAction('[Reparaciones] Establecer Reparaciones', props<{ reparaciones: any[] }>());
+export const startCita = createAction('[Cita] Empezar cita');
+export const stopCita = createAction('[Cita] Eliminar cita');

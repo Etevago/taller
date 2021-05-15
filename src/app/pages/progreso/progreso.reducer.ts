@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago, setReparaciones } from './progreso.actions';
+import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago, setReparaciones, stopCita, startCita } from './progreso.actions';
 
 export interface State {
     cont: number
@@ -8,6 +8,7 @@ export interface State {
     parar: boolean
     pago: number
     reparaciones: any[]
+    cita: boolean;
 }
 
 export const initialState: State = {
@@ -16,7 +17,8 @@ export const initialState: State = {
     reparando: false,
     parar: false,
     pago: 0,
-    reparaciones: []
+    reparaciones: [],
+    cita: false
 }
 
 const _contadorReducer = createReducer(initialState,
@@ -29,6 +31,8 @@ const _contadorReducer = createReducer(initialState,
     on(stopReparar, state => ({ ...state, reparando: false })),
     on(setPago, (state, { pago }) => ({ ...state, pago: pago })),
     on(setReparaciones, (state, { reparaciones }) => ({ ...state, reparaciones: [...reparaciones] })),
+    on(startCita, state => ({ ...state, cita: true })),
+    on(stopCita, state => ({ ...state, cita: false })),
 
 
 

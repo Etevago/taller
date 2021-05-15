@@ -1,8 +1,10 @@
+import { takeUntil } from 'rxjs/operators';
 import { AppState } from '../../app.reducer';
 import { DashboardService } from '../../dashboard/dashboard.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { contador } from './progreso.actions';
+import { Subject } from 'rxjs';
 
 
 @Component({
@@ -12,15 +14,16 @@ import { contador } from './progreso.actions';
 
   ]
 })
-export class ProgresoComponent implements OnInit {
+export class ProgresoComponent implements OnInit, OnDestroy {
 
-  ingresos: number = 0;
+  private unsubscribe: Subject<void> = new Subject();
+
   egresos: number = 0;
-  totalIngresos: number = 0;
   totalEgresos: number = 0;
   total: number;
   contador: number = 0;
   parar: boolean;
+  cita: boolean;
 
 
   constructor(private store: Store<AppState>, private ds: DashboardService) {
@@ -29,13 +32,11 @@ export class ProgresoComponent implements OnInit {
   ngOnInit(): void {
 
 
-     this.store.select("contador").subscribe(({ cont }) => {
-       this.contador = cont;
-     })
-
-    // this.store.select("user").subscribe(({ user }) => {
-    //   this.contador = user.contador
-    // })
+    this.store.select("contador")
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((res) => {
+        this.cita = res.cita
+      });
 
   }
 
@@ -60,11 +61,15 @@ export class ProgresoComponent implements OnInit {
         clearInterval(intervalo);
       }
 
-      console.log("sumando funcion");
       this.store.dispatch(contador())
     }, 1000)
 
 
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe.next()
+    this.unsubscribe.complete()
   }
 
 

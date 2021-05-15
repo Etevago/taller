@@ -47,18 +47,18 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(ui.isLoading())
 
-    // Swal.fire({
-    //   title: 'Espere por favor',
-    //   didOpen: () => {
-    //     Swal.showLoading()
-    //   }
-    // })
+    Swal.fire({
+      title: 'Espere por favor',
+      didOpen: () => {
+        Swal.showLoading()
+      }
+    })
 
     const { email, password } = this.login.value
     this.auth.loginUsuario(email, password)
       .then(
         params => {
-          // Swal.close()
+          Swal.close()
           this.store.dispatch(ui.stopLoading())
 
           this.router.navigate(["/"])
@@ -69,9 +69,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.store.dispatch(ui.stopLoading())
           Swal.fire({
             icon: 'error',
-            title: 'Oops...',
-            text: error.message,
-            footer: '<a href>Why do I have this issue?</a>'
+            title: 'Error',
+            text: "Usuario o contraseña incorrectos",
           })
         }
       )

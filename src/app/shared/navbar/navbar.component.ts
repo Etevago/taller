@@ -9,6 +9,7 @@ import { AppState } from 'src/app/app.reducer';
   templateUrl: './navbar.component.html',
   styles: [
     `
+    @import url('https://fonts.googleapis.com/css2?family=Acme&family=Days+One&family=Exo:ital,wght@1,300;1,600&family=Play:wght@400;700&display=swap');
     .titulo{
       font-family:"Copperplate"
     }

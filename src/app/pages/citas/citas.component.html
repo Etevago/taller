@@ -1,8 +1,15 @@
-<div class='demo-app'>
-
+<div class='demo-app text-center'>
     <div *ngIf="!cita">
-        <h3>Elige tu reparación</h3>
-        <mat-form-field appearance="fill">
+        <section class="wrap">
+            <a class="navbar-brand" id="head">
+                <img src="assets/images/repara.png" alt="logo" />
+            </a>
+            <h1 id="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">BIENVENIDO A TALLERES SENÉN</h1>
+        </section>
+        <br class="clearfix">
+        <h2 id="select" style="margin-top:60px; margin-left: 580px;">Elige tu reparación:</h2>
+
+        <mat-form-field appearance="fill" id="select">
             <mat-label>Opcion</mat-label>
             <mat-select [formControl]="opcionControl" multiple [(value)]="selected">
                 <mat-optgroup *ngFor="let group of opcionGroups" [label]="group.name" [disabled]="group.disabled">
@@ -13,29 +20,28 @@
                 </mat-optgroup>
             </mat-select>
         </mat-form-field>
+        <br class="clearfix">
 
-        <h3>Ha elegido las siguientes reparaciones:</h3>
-        <ul>
-            <li *ngFor="let opcion of selected">{{opcion.value | select}}: {{opcion.price}}€</li>
+        <p class="h6" *ngIf="selected.length>0">Ha elegido las siguientes reparaciones:</p>
+        <ul style="list-style-type:none ">
+            <li style="font-size:15px" *ngFor="let opcion of selected">{{opcion.value | select}}: {{opcion.price}}€</li>
         </ul>
+        <br class="clearfix">
 
         <button class="btn btn-primary" [disabled]="selected.length===0" (click)="confirmar()">Confirmar cita</button>
     </div>
 
-    <div class='demo-app-sidebar'>
 
-        <div class='demo-app-sidebar-section'>
-            <ul>
-                <li *ngFor='let event of currentEvents'>
-                    <b>{{event.startStr}}</b>
-                    <i>{{event.title}}</i>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <div class='demo-app-main'>
-        <full-calendar *ngIf='cita' [options]='calendarOptions'></full-calendar>
+    <div *ngIf='cita' class='demo-app-main'>
+        <button class="btn btn-secondary" style="float:right;" (click)="atras()">Atrás</button>
+        <full-calendar [options]='calendarOptions'></full-calendar>
     </div>
 
 </div>
+
+<div class="template">
+    <label for="time">Selecciona una hora para tu cita:</label>
+    <input type="time" id="time" name="time" min="09:00" max="20:00" required>
+</div>
+
+estadisticas barra progreso y progreso si no cita

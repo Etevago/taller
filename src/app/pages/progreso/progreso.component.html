@@ -1,58 +1,36 @@
-<div class="row m-5">
+<section *ngIf="cita" class="wrapper">
+    <button class="btn" (click)="reparar()">Reparar</button>
 
-    <div class="col-12">
-        <div class="card card-statistics">
-            <div class="card-body">
+    <div class="row m-5">
 
-                <div class="clearfix">
-                    <div class="float-left">
-                        <i class="fa fa-building text-info icon-lg"></i>
-                    </div>
-                    <div class="float-right">
-                        <p class="mb-0 text-right">Diferencia</p>
-                        <div class="fluid-container">
-                            <h3 [ngClass]="{
-                        'text-success': total > 0,
-                        'text-danger': total < 0
-                      }" class="font-weight-medium text-right mb-0">
-                                {{ total | currency }}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+        <div class="col-12">
+            <mat-progress-bar mode="determinate" [value]="contador"></mat-progress-bar>
+            <div class="row justify-content-around">
 
-
-<button class="btn" (click)="reparar()">Reparar</button>
-
-<div class="row m-5">
-
-    <div class="col-12">
-        <mat-progress-bar mode="determinate" [value]="contador"></mat-progress-bar>
-        <div class="row justify-content-around">
-
-            <div class="col-3">
-                <!-- <i *ngIf="contador>=25" class="fas fa-level-up-alt fa-2x"></i>
+                <div class="col-3">
+                    <!-- <i *ngIf="contador>=25" class="fas fa-level-up-alt fa-2x"></i>
                 <p *ngIf="contador>=25">Reparacion X completada</p> -->
-            </div>
-            <div class="col-3">
-                <span *ngIf="contador>=25">Reparacion X completada</span>
-                <i *ngIf="contador>=25" class="fas fa-level-up-alt fa-2x"></i>
-            </div>
-            <div class="col-3">
-                <span *ngIf="contador>=50">Reparacion X completada</span>
-                <i *ngIf="contador>=50" class="fas fa-level-up-alt fa-2x"></i>
-            </div>
-            <div class="col-3">
-                <span *ngIf="contador>=75">Reparacion X completada</span>
-                <i *ngIf="contador>=75" class="fas fa-level-up-alt fa-2x"></i>
-            </div>
+                </div>
+                <div class="col-3">
+                    <span *ngIf="contador>=25">Reparacion X completada</span>
+                    <i *ngIf="contador>=25" class="fas fa-level-up-alt fa-2x"></i>
+                </div>
+                <div class="col-3">
+                    <span *ngIf="contador>=50">Reparacion X completada</span>
+                    <i *ngIf="contador>=50" class="fas fa-level-up-alt fa-2x"></i>
+                </div>
+                <div class="col-3">
+                    <span *ngIf="contador>=75">Reparacion X completada</span>
+                    <i *ngIf="contador>=75" class="fas fa-level-up-alt fa-2x"></i>
+                </div>
 
-            <!-- <i *ngIf="contador>=100" class="fas fa-level-up-alt fa-2x"></i>
+                <!-- <i *ngIf="contador>=100" class="fas fa-level-up-alt fa-2x"></i>
             <p *ngIf="contador>=100">Reparacion X completada</p> -->
+            </div>
         </div>
     </div>
+</section>
+
+<div *ngIf="!cita">
+    No cita
 </div>

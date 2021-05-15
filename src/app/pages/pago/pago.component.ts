@@ -16,8 +16,7 @@ import { AppState } from 'src/app/app.reducer';
 export class PagoComponent implements OnInit, OnDestroy {
   private unsubscribe: Subject<void> = new Subject();
 
-  ingresoForm: FormGroup;
-  tipo: string = 'ingreso';
+  tallerForm: FormGroup;
   cargando: boolean = false;
   loadingSubs: Subscription;
   pagoTotal: number
@@ -38,7 +37,7 @@ export class PagoComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(({ isLoading }) => this.cargando = isLoading);
 
-    this.ingresoForm = this.fb.group({
+    this.tallerForm = this.fb.group({
       descripcion: ['', Validators.required],
       cantidad: ['', Validators.required],
     });

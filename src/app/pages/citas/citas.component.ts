@@ -1,3 +1,4 @@
+import { startCita, stopCita } from './../progreso/progreso.actions';
 import Swal from 'sweetalert2';
 import { setReparaciones } from '../progreso/progreso.actions';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -28,6 +29,25 @@ interface OpcionGroup {
   selector: 'app-citas',
   templateUrl: './citas.component.html',
   styles: [
+    `
+    @import url('https://fonts.googleapis.com/css2?family=Acme&family=Days+One&family=Exo:ital,wght@1,300;1,600&family=Play:wght@400;700&display=swap');
+    .clearfix {
+    float: none;
+    clear: both;
+}
+#head {
+    overflow: hidden;
+    margin: -20px -200px 22px 300px;
+    float: left;
+    text-align: center;
+}
+#select {
+    overflow: hidden;
+    margin: 50px -290px 0px 300px;
+    float: left;
+    text-align: center;
+}
+    `
   ]
 })
 export class CitasComponent implements OnInit, OnDestroy {
@@ -72,7 +92,8 @@ export class CitasComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((res) => {
         this.pagoTotal = res.pago
-        if (res.reparaciones.length > 0) this.selected = res.reparaciones
+        if (res.reparaciones.length > 0) this.selected = res.reparaciones;
+        this.cita = res.cita
       });
   }
 
@@ -98,7 +119,6 @@ export class CitasComponent implements OnInit, OnDestroy {
     this.selected.forEach((opcion: Opcion) => {
       suma += opcion.price
     });
-    // sumaFinal = Math.round(suma * 1e3) / 1e3
     sumaFinal = suma.toFixed(2)
     Swal.fire({
       title: 'Pago total: ' + sumaFinal + "€",
@@ -112,7 +132,7 @@ export class CitasComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         Swal.fire(
           'Éxito',
-          'Tu cita se ha confirmado',
+          'Selecciona el día de tu cita',
           'success'
         )
         this.selected.forEach((opcion: Opcion) => {
@@ -124,6 +144,8 @@ export class CitasComponent implements OnInit, OnDestroy {
         this.cita = true;
         this.store.dispatch(setPago({ pago: pagoFinal }))
         this.store.dispatch(setReparaciones({ reparaciones: this.selected }))
+        this.store.dispatch(startCita())
+
       }
     })
 
@@ -136,7 +158,7 @@ export class CitasComponent implements OnInit, OnDestroy {
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth'
+      right: '',
     },
     locales: [esLocale],
     locale: "es",
@@ -159,20 +181,32 @@ export class CitasComponent implements OnInit, OnDestroy {
     */
   };
 
+  atras() {
+    this.cita = false;
+    this.pagoTotal = 0;
+    this.selected = []
+    this.store.dispatch(setPago({ pago: 0 }))
+    this.store.dispatch(setReparaciones({ reparaciones: [] }))
+    this.store.dispatch(stopCita())
+
+  }
+
   handleCalendarToggle() {
     this.calendarVisible = !this.calendarVisible;
   }
 
   getEventId(title: string): string {
     let a: Promise<any>
-    let o = ""
+    let fecha = ""
     setTimeout(() => {
       for (let i = 0; i < this.arrayItems.length; i++) {
         console.log("ARRAY: " + this.arrayItems[i].data.title);
         console.log("ORIGINAL:" + title);
         if (this.arrayItems[i].data.title === title) {
+          // CAMBIAR CONDICION
           console.log("dentro");
-          a.then(o = this.arrayItems[i].uid)
+          a.then(fecha = this.arrayItems[i].uid)
+          console.log(this.arrayItems[i].uid);
         }
       }
     }, 100);
@@ -187,7 +221,10 @@ export class CitasComponent implements OnInit, OnDestroy {
   }
 
   handleDateSelect(selectInfo: DateSelectArg) {
-    const title = "Reparación " + this.nombre + Math.random() * 9999999
+
+    // modalService.open('custom-modal-1')
+
+    const title = "Reparación " + this.nombre
     this.getEventId(title)
     const calendarApi = selectInfo.view.calendar;
 
