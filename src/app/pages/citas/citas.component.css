@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Acme&family=Days+One&family=Exo:ital,wght@1,300;1,600&family=Play:wght@400;700&display=swap');
+.clearfix {
+    float: none;
+    clear: both;
+}
+
+#head {
+    overflow: hidden;
+    margin: -20px -200px 22px 300px;
+    float: left;
+    text-align: center;
+}
+
+#select {
+    overflow: hidden;
+    margin: 50px -290px 0px 300px;
+    float: left;
+    text-align: center;
+}

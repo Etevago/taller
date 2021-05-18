@@ -45,67 +45,65 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       this.store.dispatch(startContador())
 
+
+
       this.segundosActuales = new Date().getTime()
-      this.store.select("user").subscribe(params => {
-        this.segundosFB = params.user?.tiempo
-      })
-      this.store.select("user").subscribe(params => {
-        this.contador = params.user?.contador
-      })
+      this.store.select("user")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(params => {
+          this.segundosFB = params.user?.tiempo
+          this.contador = params.user?.contador
+          this.reparando = params.user?.reparando
+        })
 
       const diferencia = (this.segundosActuales - this.segundosFB) / 1000
       this.contador += diferencia
 
-
-
-      this.store.select("user").subscribe(params => {
-        this.reparando = params.user?.reparando
-      })
-
       if (this.reparando) {
         this.store.dispatch(reparar())
         this.store.dispatch(setContador({ actual: this.contador }))
-
         this.store.select("contador").subscribe(params => {
           this.parar = params.parar
         })
 
 
         if (this.reparando) {
+          this.store.select("contador")
+            .pipe(takeUntil(this.unsubscribe))
+            .subscribe((res) => {
+              this.contador = res.cont
+            });
           const intervalo = setInterval(() => {
+            console.log(this.contador);
 
-            this.store.select("contador").subscribe(params => {
-              this.parar = params.parar
-            })
             if (this.contador >= 100) {
               this.ds.reparacionCompleta()
               this.ds.stopReparacion();
               clearInterval(intervalo);
-              ;
             }
             else if (this.parar) {
               this.ds.stopReparacion();
               clearInterval(intervalo);
-              ;
             }
-            console.log("sumando dashboard");
+
             this.store.dispatch(contador())
           }, 1000)
         }
 
       }
-      this.store.select("user").subscribe(({ user }) => {
-        if (user.contador == 100) {
-          this.store.dispatch(setContador({ actual: 100 }))
-        }
-      })
+      this.store.select("user")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({ user }) => {
+          if (user.contador >= 100) {
+            this.store.dispatch(setContador({ actual: 100 }))
+          }
+        })
     }, 1000);
 
 
   }
 
   ngOnDestroy() {
-
     this.unsubscribe.next()
     this.unsubscribe.complete()
   }

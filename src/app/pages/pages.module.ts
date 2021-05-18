@@ -8,7 +8,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DashboardComponent } from '../dashboard/dashboard.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgxPayPalModule } from 'ngx-paypal';
 import { FullCalendarModule } from '@fullcalendar/angular'; // the main connector. must go first
@@ -40,7 +40,7 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     NgxPayPalModule,
     FullCalendarModule,
     MatSelectModule,
-
+    FormsModule
 
   ],
   exports: [

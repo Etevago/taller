@@ -30,12 +30,11 @@ export class ProgresoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
-
     this.store.select("contador")
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((res) => {
         this.cita = res.cita
+        this.contador = res.cont
       });
 
   }

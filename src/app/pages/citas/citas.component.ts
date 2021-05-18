@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { startCita, stopCita } from './../progreso/progreso.actions';
 import Swal from 'sweetalert2';
 import { setReparaciones } from '../progreso/progreso.actions';
@@ -6,12 +7,13 @@ import { AppState } from '../../app.reducer';
 import { filter, takeUntil } from 'rxjs/operators';
 import { CalendarService } from '../../services/calendar.service';
 import { Subject } from 'rxjs';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, ElementRef, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
 import esLocale from '@fullcalendar/core/locales/es';
 import { FormControl } from '@angular/forms';
 import { setPago } from '../progreso/progreso.actions';
+import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 
 interface Opcion {
   value: string;
@@ -28,32 +30,17 @@ interface OpcionGroup {
 @Component({
   selector: 'app-citas',
   templateUrl: './citas.component.html',
-  styles: [
-    `
-    @import url('https://fonts.googleapis.com/css2?family=Acme&family=Days+One&family=Exo:ital,wght@1,300;1,600&family=Play:wght@400;700&display=swap');
-    .clearfix {
-    float: none;
-    clear: both;
-}
-#head {
-    overflow: hidden;
-    margin: -20px -200px 22px 300px;
-    float: left;
-    text-align: center;
-}
-#select {
-    overflow: hidden;
-    margin: 50px -290px 0px 300px;
-    float: left;
-    text-align: center;
-}
-    `
-  ]
+  styleUrls: ['./citas.component.css'],
+  encapsulation: ViewEncapsulation.None
+
 })
 export class CitasComponent implements OnInit, OnDestroy {
 
-  private unsubscribe: Subject<void> = new Subject();
+  @ViewChild('content') content: ElementRef;
+  @ViewChild('hora') hora: ElementRef;
 
+  private unsubscribe: Subject<void> = new Subject();
+  closeResult = '';
   pagoTotal = 0;
   suma = 0;
   cita = false;
@@ -64,11 +51,15 @@ export class CitasComponent implements OnInit, OnDestroy {
   iniciales = [];
   selected: any[] = []
   arrayItems = []
+  horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"]
   itemId: string
-  constructor(private store: Store<AppState>, private calendarS: CalendarService, private firestore: AngularFirestore) { }
+
+  constructor(private store: Store<AppState>, private calendarS: CalendarService, private router: Router, private modalService: NgbModal, config: NgbModalConfig) {
+    config.backdrop = 'static';
+    config.keyboard = false;
+  }
 
   ngOnInit(): void {
-
     this.selected.forEach(option => {
       this.suma += option.price
     });
@@ -111,7 +102,11 @@ export class CitasComponent implements OnInit, OnDestroy {
           });
           this.calendarOptions.events = this.iniciales
         })
-    )
+    );
+
+  open(content) {
+    this.modalService.open(content);
+  }
 
   confirmar() {
     let suma = 0;
@@ -148,10 +143,7 @@ export class CitasComponent implements OnInit, OnDestroy {
 
       }
     })
-
-
   }
-
 
   calendarVisible = true;
   calendarOptions: CalendarOptions = {
@@ -174,11 +166,6 @@ export class CitasComponent implements OnInit, OnDestroy {
     select: this.handleDateSelect.bind(this),
     eventClick: this.handleEventClick.bind(this),
     eventsSet: this.handleEvents.bind(this)
-    /* you can update a remote database when these fire:
-    eventAdd:
-    eventChange:
-    eventRemove:
-    */
   };
 
   atras() {
@@ -191,26 +178,18 @@ export class CitasComponent implements OnInit, OnDestroy {
 
   }
 
-  handleCalendarToggle() {
-    this.calendarVisible = !this.calendarVisible;
-  }
-
-  getEventId(title: string): string {
-    let a: Promise<any>
+  async getEventId(title: string) {
     let fecha = ""
-    setTimeout(() => {
-      for (let i = 0; i < this.arrayItems.length; i++) {
-        console.log("ARRAY: " + this.arrayItems[i].data.title);
-        console.log("ORIGINAL:" + title);
-        if (this.arrayItems[i].data.title === title) {
-          // CAMBIAR CONDICION
-          console.log("dentro");
-          a.then(fecha = this.arrayItems[i].uid)
-          console.log(this.arrayItems[i].uid);
+    return new Promise<any>(res => {
+      setTimeout(() => {
+        for (let i = 0; i < this.arrayItems.length; i++) {
+          if (this.arrayItems[i].data.title === title) {
+            fecha = this.arrayItems[i].uid
+          }
         }
-      }
-    }, 100);
-    return "3soKIgaY4iKcF2VIZMgo"
+        res(fecha);
+      }, 100);
+    });
   }
 
 
@@ -220,16 +199,21 @@ export class CitasComponent implements OnInit, OnDestroy {
     calendarOptions.weekends = !calendarOptions.weekends;
   }
 
-  handleDateSelect(selectInfo: DateSelectArg) {
+  async handleDateSelect(selectInfo: DateSelectArg) {
 
-    // modalService.open('custom-modal-1')
+    this.modalService.open(this.content)
+    // console.log(this.content.nativeElement);
 
-    const title = "Reparación " + this.nombre
-    this.getEventId(title)
+    const title = "Reparación " + this.nombre + Math.random() * 102012
+    let idApi = "a";
+    this.getEventId(title).then(value => {
+      idApi = value
+      console.log("value" + value);
+    })
+
     const calendarApi = selectInfo.view.calendar;
 
     calendarApi.unselect(); // clear date selection
-
     if (title) {
       this.calendarS.crearFecha({
         title,
@@ -237,22 +221,26 @@ export class CitasComponent implements OnInit, OnDestroy {
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
       });
+      console.log("api" + idApi);
 
       calendarApi.addEvent({
-        id: "EUVA1JVNJMRn3i8SK3tm",
+        id: idApi,
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
       });
     }
+
+    this.router.navigate(["progreso"])
+
   }
 
   handleEventClick(clickInfo: EventClickArg) {
     if (confirm(`¿Seguro que quieres eliminar tu cita? '${clickInfo.event.title}'`)) {
       clickInfo.event.remove();
-      console.log(clickInfo);
-      this.calendarS.borrarFecha(clickInfo.event.id)
+      console.log(clickInfo.event.id);
+      // this.calendarS.borrarFecha(clickInfo.event.id)
     }
   }
 

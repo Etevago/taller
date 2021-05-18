@@ -39,9 +39,27 @@
 
 </div>
 
-<div class="template">
-    <label for="time">Selecciona una hora para tu cita:</label>
-    <input type="time" id="time" name="time" min="09:00" max="20:00" required>
-</div>
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Selecciona hora para tu cita</h4>
+        <!-- <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button> -->
+    </div>
+    <div class="modal-body">
+        <form>
+            <label for="hora">Elige tu hora: &nbsp;</label>
+            <select name="hora" id="hora" #hora>
+                <option *ngFor="let hora of horas" value="hora">{{hora}}</option>
+            </select>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="c('Save click')">Confirmar</button>
+        <!-- <button type="submit" class="btn btn-outline-dark">Guardar</button> -->
 
-estadisticas barra progreso y progreso si no cita
+    </div>
+</ng-template>
+
+
+<br> estadisticas barra progreso y progreso si no cita
