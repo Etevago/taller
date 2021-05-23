@@ -24,22 +24,43 @@ export class ProgresoComponent implements OnInit, OnDestroy {
   contador: number = 0;
   parar: boolean;
   cita: boolean;
-
-
+  reparaciones = []
+  visibles = [];
+  
   constructor(private store: Store<AppState>, private ds: DashboardService) {
   }
 
   ngOnInit(): void {
-    this.store.select("contador")
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((res) => {
-        this.cita = res.cita
-        this.contador = res.cont
-      });
+
+      this.store.select("contador")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe((cont) => {
+          this.cita = cont.cita
+          this.contador = Number(cont.cont.toFixed())
+          this.reparaciones = cont.reparacion
+          const x = this.contador * this.reparaciones.length / 100;
+          const rep = this.reparaciones[(x) - 1];
+          const repDec = this.reparaciones[Number((this.contador * this.reparaciones.length / 100).toFixed()) - 1]
+          if (this.contador >= 100) {
+            for (const key in this.reparaciones) {
+              if (Object.prototype.hasOwnProperty.call(this.reparaciones, key)) {
+                const element = this.reparaciones[key];
+                this.visibles.push(element)
+              }
+            }
+          }
+          console.log(this.visibles);
+          if ((repDec != undefined) && (!this.visibles.find(param => param == repDec)) &&
+            ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))) )) {
+            this.visibles.push(repDec);
+          } else if ((rep != undefined) && (!this.visibles.find(param => param == rep)) &&
+            ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))) )) {
+            this.visibles.push(rep);
+          }
+
+        });
 
   }
-
-
 
   reparar() {
     this.ds.crearReparacion()
@@ -48,12 +69,12 @@ export class ProgresoComponent implements OnInit, OnDestroy {
     })
 
     const intervalo = setInterval(() => {
-      console.log(this.contador);
 
       if (this.contador >= 100) {
         this.ds.reparacionCompleta()
         this.ds.stopReparacion();
         clearInterval(intervalo);
+        return 2;
       }
       else if (this.parar) {
         this.ds.stopReparacion();

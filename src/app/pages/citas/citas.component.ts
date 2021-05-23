@@ -1,3 +1,4 @@
+import { CitaService } from './../../services/cita.service';
 import { Router } from '@angular/router';
 import { startCita, stopCita } from './../progreso/progreso.actions';
 import Swal from 'sweetalert2';
@@ -7,13 +8,15 @@ import { AppState } from '../../app.reducer';
 import { filter, takeUntil } from 'rxjs/operators';
 import { CalendarService } from '../../services/calendar.service';
 import { Subject } from 'rxjs';
-import { Component, OnDestroy, OnInit, ViewEncapsulation, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, ElementRef, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
 import esLocale from '@fullcalendar/core/locales/es';
 import { FormControl } from '@angular/forms';
 import { setPago } from '../progreso/progreso.actions';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
+import * as moment from 'moment';
+import { exit } from 'process';
 
 interface Opcion {
   value: string;
@@ -37,9 +40,11 @@ interface OpcionGroup {
 export class CitasComponent implements OnInit, OnDestroy {
 
   @ViewChild('content') content: ElementRef;
-  @ViewChild('hora') hora: ElementRef;
+  @Input() public hora;
 
   private unsubscribe: Subject<void> = new Subject();
+  hora2;
+  siguiente = false;
   closeResult = '';
   pagoTotal = 0;
   suma = 0;
@@ -54,12 +59,13 @@ export class CitasComponent implements OnInit, OnDestroy {
   horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"]
   itemId: string
 
-  constructor(private store: Store<AppState>, private calendarS: CalendarService, private router: Router, private modalService: NgbModal, config: NgbModalConfig) {
+  constructor(private store: Store<AppState>, private calendarS: CalendarService, private citaS: CitaService, private router: Router, private modalService: NgbModal, config: NgbModalConfig) {
     config.backdrop = 'static';
     config.keyboard = false;
   }
 
   ngOnInit(): void {
+ 
     this.selected.forEach(option => {
       this.suma += option.price
     });
@@ -73,8 +79,8 @@ export class CitasComponent implements OnInit, OnDestroy {
 
     this.store.select("items")
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({ items }) => {
-        items.forEach(item => {
+      .subscribe(({ calendar }) => {
+        calendar.forEach(item => {
           this.arrayItems.push(item)
         });
       })
@@ -83,7 +89,7 @@ export class CitasComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((res) => {
         this.pagoTotal = res.pago
-        if (res.reparaciones.length > 0) this.selected = res.reparaciones;
+        // if (res.reparaciones.length > 0) this.selected = res.reparaciones;
         this.cita = res.cita
       });
   }
@@ -130,16 +136,7 @@ export class CitasComponent implements OnInit, OnDestroy {
           'Selecciona el día de tu cita',
           'success'
         )
-        this.selected.forEach((opcion: Opcion) => {
-          this.pagoTotal += opcion.price
-        });
-        let pagoFinal = 0;
-        pagoFinal = Math.round(this.pagoTotal * 1e2) / 1e2
-
-        this.cita = true;
-        this.store.dispatch(setPago({ pago: pagoFinal }))
-        this.store.dispatch(setReparaciones({ reparaciones: this.selected }))
-        this.store.dispatch(startCita())
+        this.siguiente = true;
 
       }
     })
@@ -169,14 +166,10 @@ export class CitasComponent implements OnInit, OnDestroy {
   };
 
   atras() {
-    this.cita = false;
-    this.pagoTotal = 0;
-    this.selected = []
-    this.store.dispatch(setPago({ pago: 0 }))
-    this.store.dispatch(setReparaciones({ reparaciones: [] }))
-    this.store.dispatch(stopCita())
-
+    this.siguiente = false;
   }
+
+
 
   async getEventId(title: string) {
     let fecha = ""
@@ -193,17 +186,22 @@ export class CitasComponent implements OnInit, OnDestroy {
   }
 
 
-
-  handleWeekendsToggle() {
-    const { calendarOptions } = this;
-    calendarOptions.weekends = !calendarOptions.weekends;
-  }
-
   async handleDateSelect(selectInfo: DateSelectArg) {
-
-    this.modalService.open(this.content)
+    let hoy = new Date().getDate().toString()
+    let diaFecha = selectInfo.startStr.substr(8, 2)
+    if (!moment().isBefore(selectInfo.startStr) && (hoy != diaFecha)) {
+      return;
+    }
+    // this.modalService.open(this.content)
+    // const modalRef = this.modalService.open(this.content, { size: 'lg' });
+    // modalRef.componentInstance.hora = this.hora;
+    // modalRef.result.then((result) => {
+    //     if (result) {                
+    //         console.log("trueeee");
+    //     }
+    // },
+    //     (reason) => { })
     // console.log(this.content.nativeElement);
-
     const title = "Reparación " + this.nombre + Math.random() * 102012
     let idApi = "a";
     this.getEventId(title).then(value => {
@@ -232,6 +230,17 @@ export class CitasComponent implements OnInit, OnDestroy {
       });
     }
 
+    this.selected.forEach((opcion: Opcion) => {
+      this.pagoTotal += opcion.price
+    });
+    let pagoFinal = 0;
+    pagoFinal = Math.round(this.pagoTotal * 1e2) / 1e2
+
+    this.cita = true;
+    this.store.dispatch(setPago({ pago: pagoFinal }))
+    this.store.dispatch(setReparaciones({ reparacion: this.selected }))
+    this.citaS.crearCita(this.selected)
+    this.store.dispatch(startCita())
     this.router.navigate(["progreso"])
 
   }

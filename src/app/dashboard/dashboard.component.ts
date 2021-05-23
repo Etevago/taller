@@ -1,6 +1,7 @@
-import { setItems } from './items.actions';
+import { CitaService } from './../services/cita.service';
+import { setCalendar, setCitas } from './items.actions';
 import { CalendarService } from './../services/calendar.service';
-import { setContador, reparar, contador, startContador } from './../pages/progreso/progreso.actions';
+import { setContador, reparar, contador, startContador, setUser, setReparaciones } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -23,83 +24,92 @@ export class DashboardComponent implements OnInit, OnDestroy {
   reparando: boolean;
   parar: boolean;
   calendarSubs: Subscription;
-
-  constructor(private store: Store<AppState>, private ds: DashboardService, private calendarS: CalendarService) { }
+  reparaciones = [];
+  constructor(private store: Store<AppState>, private ds: DashboardService, private calendarS: CalendarService, private citaS: CitaService) { }
 
   ngOnInit(): void {
 
     this.store.select("user")
-      .pipe(
-        takeUntil(this.unsubscribe),
-        filter(auth => auth.user != null)
-      )
-      .subscribe(
-        ({ user }) => this.calendarSubs = this.calendarS.initCalendarListener(user.uid)
-          .subscribe((tallerFB: any) => {
-            this.store.dispatch(setItems({ items: tallerFB }))
-
+    .pipe(
+      takeUntil(this.unsubscribe),
+      filter(auth => auth.user != null)
+    )
+    .subscribe(
+      ({ user }) => {
+        this.calendarS.initCalendarListener(user.uid)
+          .subscribe((calendar: any) => {
+            this.store.dispatch(setCalendar({ items: calendar }))
+            this.store.dispatch(setUser({ user: user.uid }))
           })
-      )
 
-    setTimeout(() => {
+        this.citaS.initCitaListener(user.uid)
+          .subscribe((citas: any) => {
+            this.store.dispatch(setCitas({ items: citas }))
+          })
 
-      this.store.dispatch(startContador())
-
-
-
-      this.segundosActuales = new Date().getTime()
-      this.store.select("user")
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(params => {
-          this.segundosFB = params.user?.tiempo
-          this.contador = params.user?.contador
-          this.reparando = params.user?.reparando
-        })
-
-      const diferencia = (this.segundosActuales - this.segundosFB) / 1000
-      this.contador += diferencia
-
-      if (this.reparando) {
-        this.store.dispatch(reparar())
-        this.store.dispatch(setContador({ actual: this.contador }))
-        this.store.select("contador").subscribe(params => {
-          this.parar = params.parar
-        })
-
-
-        if (this.reparando) {
-          this.store.select("contador")
-            .pipe(takeUntil(this.unsubscribe))
-            .subscribe((res) => {
-              this.contador = res.cont
-            });
-          const intervalo = setInterval(() => {
-            console.log(this.contador);
-
-            if (this.contador >= 100) {
-              this.ds.reparacionCompleta()
-              this.ds.stopReparacion();
-              clearInterval(intervalo);
-            }
-            else if (this.parar) {
-              this.ds.stopReparacion();
-              clearInterval(intervalo);
-            }
-
-            this.store.dispatch(contador())
-          }, 1000)
-        }
-
-      }
-      this.store.select("user")
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(({ user }) => {
+          this.segundosFB = user?.tiempo
+          this.contador = user?.contador
+          this.reparando = user?.reparando
           if (user.contador >= 100) {
             this.store.dispatch(setContador({ actual: 100 }))
           }
-        })
-    }, 1000);
+      }
+    )
 
+    setTimeout(() => {
+    this.store.dispatch(startContador())
+
+    this.store.select("items")
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(({ reparaciones }) => {
+        if (reparaciones.length > 0) {
+          this.reparaciones = reparaciones
+          this.reparaciones = this.reparaciones[0].data
+          const pasar = [];
+          Object.keys(this.reparaciones).forEach(key => {
+            const data = {}
+            data[key] = this.reparaciones[key]
+            pasar.push(data)
+          })
+          this.store.dispatch(setReparaciones({ reparacion: pasar }))
+        }
+      })
+
+    this.segundosActuales = new Date().getTime()
+    const diferencia = (this.segundosActuales - this.segundosFB) / 1000
+    this.contador += diferencia
+
+    if (this.reparando) {
+      this.store.dispatch(reparar())
+      this.store.dispatch(setContador({ actual: this.contador }))
+      this.store.select("contador").subscribe(params => {
+        this.parar = params.parar
+      })
+
+
+      if (this.reparando) {
+        this.store.select("contador")
+          .pipe(takeUntil(this.unsubscribe))
+          .subscribe((res) => {
+            this.contador = res.cont
+          });
+        const intervalo = setInterval(() => {
+
+          if (this.contador >= 100) {
+            this.ds.reparacionCompleta()
+            this.ds.stopReparacion();
+            clearInterval(intervalo);
+          }
+          else if (this.parar) {
+            this.ds.stopReparacion();
+            clearInterval(intervalo);
+          }
+
+          this.store.dispatch(contador())
+        }, 1000)
+      }
+    }
+  }, 1000);
 
   }
 

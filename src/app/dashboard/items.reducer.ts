@@ -1,10 +1,12 @@
+import { Reparacion } from './../models/reparacion.model';
 import { Fecha } from './../models/fecha.model';
-import { setItems, unSetItems } from './items.actions';
+import { setCalendar, unSetCalendar, setCitas, unSetCitas } from './items.actions';
 import { createReducer, on } from '@ngrx/store';
 import { AppState } from '../app.reducer';
 
 export interface State {
-    items: Fecha[];
+    calendar: Fecha[];
+    reparaciones: Reparacion[]
 }
 
 export interface AppStateCalendar extends AppState {
@@ -12,14 +14,16 @@ export interface AppStateCalendar extends AppState {
 }
 
 export const initialState: State = {
-    items: [],
+    calendar: [],
+    reparaciones: []
 }
 
 const _itemsReducer = createReducer(initialState,
 
-    on(setItems, (state, { items }) => ({ ...state, items: [...items] })),
-    on(unSetItems, (state) => ({ ...state, items: [] })),
-
+    on(setCalendar, (state, { items }) => ({ ...state, calendar: [...items] })),
+    on(unSetCalendar, (state) => ({ ...state, calendar: [] })),
+    on(setCitas, (state, { items }) => ({ ...state, reparaciones: [...items] })),
+    on(unSetCitas, (state) => ({ ...state, reparaciones: [] })),
 );
 
 export function itemsReducer(state, action) {
