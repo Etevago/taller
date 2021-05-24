@@ -1,13 +1,14 @@
 import { CitaService } from './../services/cita.service';
 import { setCalendar, setCitas } from './items.actions';
 import { CalendarService } from './../services/calendar.service';
-import { setContador, reparar, contador, startContador, setUser, setReparaciones } from './../pages/progreso/progreso.actions';
+import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { AppState } from '../app.reducer';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-dashboard',
@@ -30,22 +31,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.store.select("user")
-    .pipe(
-      takeUntil(this.unsubscribe),
-      filter(auth => auth.user != null)
-    )
-    .subscribe(
-      ({ user }) => {
-        this.calendarS.initCalendarListener(user.uid)
-          .subscribe((calendar: any) => {
-            this.store.dispatch(setCalendar({ items: calendar }))
-            this.store.dispatch(setUser({ user: user.uid }))
-          })
+      .pipe(
+        takeUntil(this.unsubscribe),
+        filter(auth => auth.user != null)
+      )
+      .subscribe(
+        ({ user }) => {
+          this.calendarS.initCalendarListener(user.uid)
+            .subscribe((calendar: any) => {
+              this.store.dispatch(setCalendar({ items: calendar }))
+              this.store.dispatch(setUser({ user: user.uid }))
+            })
 
-        this.citaS.initCitaListener(user.uid)
-          .subscribe((citas: any) => {
-            this.store.dispatch(setCitas({ items: citas }))
-          })
+          this.citaS.initCitaListener(user.uid)
+            .subscribe((citas: any) => {
+              this.store.dispatch(setCitas({ items: citas }))
+            })
 
           this.segundosFB = user?.tiempo
           this.contador = user?.contador
@@ -53,63 +54,85 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if (user.contador >= 100) {
             this.store.dispatch(setContador({ actual: 100 }))
           }
-      }
-    )
+        }
+      )
 
     setTimeout(() => {
-    this.store.dispatch(startContador())
+      this.store.dispatch(startContador())
+      let indiceProximo = "0";
+      this.store.select("items")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({ calendar }) => {
+          for (const key in calendar) {
+            if (Object.prototype.hasOwnProperty.call(calendar, key)) {
+              const element: any = calendar[key];
+              console.log(element);
+              let proxima = "2099-1-1";
+              if (moment(element.data?.start).isBefore(moment(proxima))) {
+                proxima = element.data.start
+                // console.log("proxima " + proxima);
+                // console.log("key " + key);
+                indiceProximo = key
+              }
+            }
+          }
 
-    this.store.select("items")
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({ reparaciones }) => {
-        if (reparaciones.length > 0) {
-          this.reparaciones = reparaciones
-          this.reparaciones = this.reparaciones[0].data
-          const pasar = [];
-          Object.keys(this.reparaciones).forEach(key => {
-            const data = {}
-            data[key] = this.reparaciones[key]
-            pasar.push(data)
-          })
-          this.store.dispatch(setReparaciones({ reparacion: pasar }))
-        }
-      })
+        })
 
-    this.segundosActuales = new Date().getTime()
-    const diferencia = (this.segundosActuales - this.segundosFB) / 1000
-    this.contador += diferencia
+      this.store.select("items")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({ reparaciones }) => {
+          if (reparaciones.length > 0) {
+            this.reparaciones = reparaciones
+            this.reparaciones = this.reparaciones[Number(indiceProximo)].data
+            console.log(indiceProximo);
 
-    if (this.reparando) {
-      this.store.dispatch(reparar())
-      this.store.dispatch(setContador({ actual: this.contador }))
-      this.store.select("contador").subscribe(params => {
-        this.parar = params.parar
-      })
+            const pasar = [];
+            Object.keys(this.reparaciones).forEach(key => {
+              const data = {}
+              data[key] = this.reparaciones[key]
+              pasar.push(data)
+            })
+            this.store.dispatch(setReparaciones({ reparacion: pasar }))
+            this.store.dispatch(startCita())
+          }
+        })
 
+      this.segundosActuales = new Date().getTime()
+      const diferencia = (this.segundosActuales - this.segundosFB) / 1000
+      this.contador += diferencia
 
       if (this.reparando) {
-        this.store.select("contador")
-          .pipe(takeUntil(this.unsubscribe))
-          .subscribe((res) => {
-            this.contador = res.cont
-          });
-        const intervalo = setInterval(() => {
+        this.store.dispatch(reparar())
+        this.store.dispatch(setContador({ actual: this.contador }))
+        this.store.select("contador").subscribe(params => {
+          this.parar = params.parar
+        })
 
-          if (this.contador >= 100) {
-            this.ds.reparacionCompleta()
-            this.ds.stopReparacion();
-            clearInterval(intervalo);
-          }
-          else if (this.parar) {
-            this.ds.stopReparacion();
-            clearInterval(intervalo);
-          }
 
-          this.store.dispatch(contador())
-        }, 1000)
+        if (this.reparando) {
+          this.store.select("contador")
+            .pipe(takeUntil(this.unsubscribe))
+            .subscribe((res) => {
+              this.contador = res.cont
+            });
+          const intervalo = setInterval(() => {
+
+            if (this.contador >= 100) {
+              this.ds.reparacionCompleta()
+              this.ds.stopReparacion();
+              clearInterval(intervalo);
+            }
+            else if (this.parar) {
+              this.ds.stopReparacion();
+              clearInterval(intervalo);
+            }
+
+            this.store.dispatch(contador())
+          }, 1000)
+        }
       }
-    }
-  }, 1000);
+    }, 1000);
 
   }
 

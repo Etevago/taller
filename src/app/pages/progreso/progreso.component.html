@@ -1,4 +1,4 @@
-<section class="wrapper">
+<section *ngIf="cita" class="wrapper">
     <button [disabled]="contador>0" class="btn" (click)="reparar()">Reparar</button>
 
     <div class="row m-5">

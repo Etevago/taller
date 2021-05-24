@@ -1,6 +1,7 @@
+import { DashboardService } from './../../dashboard/dashboard.service';
 import { CitaService } from './../../services/cita.service';
 import { Router } from '@angular/router';
-import { startCita, stopCita } from './../progreso/progreso.actions';
+import { startCita, stopCita, setContador } from './../progreso/progreso.actions';
 import Swal from 'sweetalert2';
 import { setReparaciones } from '../progreso/progreso.actions';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -59,13 +60,13 @@ export class CitasComponent implements OnInit, OnDestroy {
   horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"]
   itemId: string
 
-  constructor(private store: Store<AppState>, private calendarS: CalendarService, private citaS: CitaService, private router: Router, private modalService: NgbModal, config: NgbModalConfig) {
+  constructor(private store: Store<AppState>, private calendarS: CalendarService, private citaS: CitaService, private router: Router, private modalService: NgbModal, config: NgbModalConfig, private ds:DashboardService) {
     config.backdrop = 'static';
     config.keyboard = false;
   }
 
   ngOnInit(): void {
- 
+
     this.selected.forEach(option => {
       this.suma += option.price
     });
@@ -169,8 +170,6 @@ export class CitasComponent implements OnInit, OnDestroy {
     this.siguiente = false;
   }
 
-
-
   async getEventId(title: string) {
     let fecha = ""
     return new Promise<any>(res => {
@@ -206,7 +205,7 @@ export class CitasComponent implements OnInit, OnDestroy {
     let idApi = "a";
     this.getEventId(title).then(value => {
       idApi = value
-      console.log("value" + value);
+      // console.log("value" + value);
     })
 
     const calendarApi = selectInfo.view.calendar;
@@ -238,9 +237,11 @@ export class CitasComponent implements OnInit, OnDestroy {
 
     this.cita = true;
     this.store.dispatch(setPago({ pago: pagoFinal }))
-    this.store.dispatch(setReparaciones({ reparacion: this.selected }))
+    // this.store.dispatch(setReparaciones({ reparacion: this.selected }))
     this.citaS.crearCita(this.selected)
     this.store.dispatch(startCita())
+    this.store.dispatch(setContador({ actual: 0 }))
+    // this.ds.reparacionReiniciar()
     this.router.navigate(["progreso"])
 
   }
