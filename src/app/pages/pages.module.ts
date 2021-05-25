@@ -15,6 +15,7 @@ import { FullCalendarModule } from '@fullcalendar/angular'; // the main connecto
 import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin
 import interactionPlugin from '@fullcalendar/interaction'; // a plugin
 import { SelectPipe } from '../pipes/select.pipe';
+import { HistoricoComponent } from './historico/historico.component';
 
 FullCalendarModule.registerPlugins([ // register FullCalendar plugins
   dayGridPlugin,
@@ -29,6 +30,7 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     CitasComponent,
     PagoComponent,
     ProgresoComponent,
+    HistoricoComponent,
     SelectPipe,
   ],
   imports: [

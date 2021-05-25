@@ -1,5 +1,5 @@
 <section *ngIf="cita" class="wrapper">
-    <button [disabled]="contador>0" class="btn" (click)="reparar()">Reparar</button>
+    <button [disabled]="reparando" class="btn" (click)="reparar()">Reparar</button>
 
     <div class="row m-5">
 

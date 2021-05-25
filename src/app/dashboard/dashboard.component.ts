@@ -1,7 +1,7 @@
-import { CitaService } from './../services/cita.service';
-import { setCalendar, setCitas } from './items.actions';
 import { CalendarService } from './../services/calendar.service';
-import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita } from './../pages/progreso/progreso.actions';
+import { CitaService } from './../services/cita.service';
+import { setCalendar } from './items.actions';
+import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -26,6 +26,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   parar: boolean;
   calendarSubs: Subscription;
   reparaciones = [];
+  visibles = [];
+  proxima = "2099-01-01"
   constructor(private store: Store<AppState>, private ds: DashboardService, private calendarS: CalendarService, private citaS: CitaService) { }
 
   ngOnInit(): void {
@@ -41,11 +43,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .subscribe((calendar: any) => {
               this.store.dispatch(setCalendar({ items: calendar }))
               this.store.dispatch(setUser({ user: user.uid }))
-            })
-
-          this.citaS.initCitaListener(user.uid)
-            .subscribe((citas: any) => {
-              this.store.dispatch(setCitas({ items: citas }))
             })
 
           this.segundosFB = user?.tiempo
@@ -66,12 +63,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           for (const key in calendar) {
             if (Object.prototype.hasOwnProperty.call(calendar, key)) {
               const element: any = calendar[key];
-              console.log(element);
-              let proxima = "2099-1-1";
-              if (moment(element.data?.start).isBefore(moment(proxima))) {
-                proxima = element.data.start
-                // console.log("proxima " + proxima);
-                // console.log("key " + key);
+              if ((element.data.start < this.proxima) && !element.data.finalizada) {
+                this.proxima = element.data.start
                 indiceProximo = key
               }
             }
@@ -81,19 +74,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       this.store.select("items")
         .pipe(takeUntil(this.unsubscribe))
-        .subscribe(({ reparaciones }) => {
-          if (reparaciones.length > 0) {
-            this.reparaciones = reparaciones
-            this.reparaciones = this.reparaciones[Number(indiceProximo)].data
-            console.log(indiceProximo);
-
+        .subscribe(({ calendar }: any) => {
+          if (calendar.length > 0) {
+            this.reparaciones = calendar[Number(indiceProximo)].data.reparaciones
+            this.visibles = calendar[Number(indiceProximo)].data.visibles
+            const repID = calendar[Number(indiceProximo)].uid
             const pasar = [];
+            const pasarVis = [];
             Object.keys(this.reparaciones).forEach(key => {
               const data = {}
               data[key] = this.reparaciones[key]
               pasar.push(data)
             })
+            Object.keys(this.visibles).forEach(key => {
+              const data = {}
+              data[key] = this.visibles[key]
+              pasarVis.push(data)
+            })
             this.store.dispatch(setReparaciones({ reparacion: pasar }))
+            this.store.dispatch(setVisibles({ visibles: pasarVis }))
+            this.store.dispatch(setID({ id: repID }))
             this.store.dispatch(startCita())
           }
         })

@@ -1,3 +1,4 @@
+import { CalendarService } from './../../services/calendar.service';
 import { takeUntil } from 'rxjs/operators';
 import { AppState } from '../../app.reducer';
 import { DashboardService } from '../../dashboard/dashboard.service';
@@ -17,17 +18,18 @@ import { Subject } from 'rxjs';
 export class ProgresoComponent implements OnInit, OnDestroy {
 
   private unsubscribe: Subject<void> = new Subject();
-
+  reparando = false;
   egresos: number = 0;
   totalEgresos: number = 0;
   total: number;
   contador: number = 0;
   parar: boolean;
   cita: boolean;
+  id: string;
   reparaciones = []
   visibles = [];
 
-  constructor(private store: Store<AppState>, private ds: DashboardService) {
+  constructor(private store: Store<AppState>, private ds: DashboardService, private calS: CalendarService) {
   }
 
   ngOnInit(): void {
@@ -35,6 +37,8 @@ export class ProgresoComponent implements OnInit, OnDestroy {
     this.store.select("contador")
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((cont) => {
+        this.reparando = cont.reparando
+        this.id = cont.id
         this.cita = cont.cita
         this.contador = Number(cont.cont.toFixed())
         this.reparaciones = cont.reparacion
@@ -43,20 +47,16 @@ export class ProgresoComponent implements OnInit, OnDestroy {
         const repDec = this.reparaciones[Number((this.contador * this.reparaciones.length / 100).toFixed()) - 1]
         if (this.contador >= 100) {
           this.visibles = this.reparaciones
-          // for (const key in this.reparaciones) {
-          //   if (Object.prototype.hasOwnProperty.call(this.reparaciones, key)) {
-          //     const element = this.reparaciones[key];
-          //     this.visibles.push(element)
-          //   }
-          // }
+          this.calS.finalizarFecha(cont.id)
         }
-        console.log(this.visibles);
         if ((repDec != undefined) && (!this.visibles.find(param => param == repDec)) &&
           ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
           this.visibles.push(repDec);
+          this.calS.updateVisibles(this.id, this.visibles)
         } else if ((rep != undefined) && (!this.visibles.find(param => param == rep)) &&
           ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
           this.visibles.push(rep);
+          this.calS.updateVisibles(this.id, this.visibles)
         }
 
       });

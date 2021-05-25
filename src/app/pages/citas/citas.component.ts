@@ -60,7 +60,7 @@ export class CitasComponent implements OnInit, OnDestroy {
   horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"]
   itemId: string
 
-  constructor(private store: Store<AppState>, private calendarS: CalendarService, private citaS: CitaService, private router: Router, private modalService: NgbModal, config: NgbModalConfig, private ds:DashboardService) {
+  constructor(private store: Store<AppState>, private calendarS: CalendarService, private citaS: CitaService, private router: Router, private modalService: NgbModal, config: NgbModalConfig, private ds: DashboardService) {
     config.backdrop = 'static';
     config.keyboard = false;
   }
@@ -217,6 +217,10 @@ export class CitasComponent implements OnInit, OnDestroy {
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
+        finalizada: false,
+        reparaciones: this.selected,
+        visibles: [],
+        pagada: false
       });
       console.log("api" + idApi);
 
@@ -238,7 +242,7 @@ export class CitasComponent implements OnInit, OnDestroy {
     this.cita = true;
     this.store.dispatch(setPago({ pago: pagoFinal }))
     // this.store.dispatch(setReparaciones({ reparacion: this.selected }))
-    this.citaS.crearCita(this.selected)
+    // this.citaS.crearCita(this.selected)
     this.store.dispatch(startCita())
     this.store.dispatch(setContador({ actual: 0 }))
     // this.ds.reparacionReiniciar()
