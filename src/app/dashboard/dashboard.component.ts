@@ -1,14 +1,13 @@
 import { CalendarService } from './../services/calendar.service';
 import { CitaService } from './../services/cita.service';
 import { setCalendar } from './items.actions';
-import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles } from './../pages/progreso/progreso.actions';
+import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles, setTitulo, setDia } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { AppState } from '../app.reducer';
-import * as moment from 'moment';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,10 +27,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   reparaciones = [];
   visibles = [];
   proxima = "2099-01-01"
+  repID: string
+  titulo: string
+  dia: string
+  pasar = []
+  pasarVis = []
   constructor(private store: Store<AppState>, private ds: DashboardService, private calendarS: CalendarService, private citaS: CitaService) { }
 
   ngOnInit(): void {
-
     this.store.select("user")
       .pipe(
         takeUntil(this.unsubscribe),
@@ -51,15 +54,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if (user.contador >= 100) {
             this.store.dispatch(setContador({ actual: 100 }))
           }
-        }
-      )
+        })
 
-    setTimeout(() => {
-      this.store.dispatch(startContador())
-      let indiceProximo = "0";
-      this.store.select("items")
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(({ calendar }) => {
+    let indiceProximo;
+    this.store.select("items")
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe(({ calendar }: any) => {
+        this.proxima = "2099-01-01";
+        if (calendar.length > 1) {
           for (const key in calendar) {
             if (Object.prototype.hasOwnProperty.call(calendar, key)) {
               const element: any = calendar[key];
@@ -69,34 +71,66 @@ export class DashboardComponent implements OnInit, OnDestroy {
               }
             }
           }
+        }
+        if (calendar.length > 0) {
+          if (indiceProximo) {
+            this.store.dispatch(startCita())
+            const proximo = Number(indiceProximo)
+            this.reparaciones = calendar[proximo].data.reparaciones
+            // this.visibles = calendar[proximo].data.visibles
+            this.repID = calendar[proximo].uid
+            this.dia = calendar[proximo].data.start
+            this.titulo = calendar[proximo].data.title
+            this.pasar = [];
+            this.pasarVis = [];
 
-        })
-
-      this.store.select("items")
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(({ calendar }: any) => {
-          if (calendar.length > 0) {
-            this.reparaciones = calendar[Number(indiceProximo)].data.reparaciones
-            this.visibles = calendar[Number(indiceProximo)].data.visibles
-            const repID = calendar[Number(indiceProximo)].uid
-            const pasar = [];
-            const pasarVis = [];
             Object.keys(this.reparaciones).forEach(key => {
               const data = {}
               data[key] = this.reparaciones[key]
-              pasar.push(data)
+              this.pasar.push(data)
             })
-            Object.keys(this.visibles).forEach(key => {
-              const data = {}
-              data[key] = this.visibles[key]
-              pasarVis.push(data)
-            })
-            this.store.dispatch(setReparaciones({ reparacion: pasar }))
-            this.store.dispatch(setVisibles({ visibles: pasarVis }))
-            this.store.dispatch(setID({ id: repID }))
-            this.store.dispatch(startCita())
+
+            // ARREGLAR 
+            // ESTO
+            // JODER
+            // this.visibles.forEach(element => {
+            //   console.log("element " + element);
+            //   Object.keys(element).forEach(element2 => {
+            //     console.log("element2 " + element2);
+            //     Object.keys(element2).forEach(key => {
+            //       const data = {}
+            //       if (this.visibles.length == 0) {
+            //         data[key] = this.visibles[element2][key]
+            //         console.log("key " + key);
+            //         console.log("entero " + this.visibles[element2][key]);
+            //         this.pasarVis.push(data)
+            //       } else {
+            //         data[this.visibles.length - 1] = this.visibles[element2][this.visibles.length - 1]
+            //         console.log("this.visibles.length-1 " + (this.visibles.length - 1));
+            //         console.log("entero " + this.visibles[element2][this.visibles.length - 1]);
+            //         this.pasarVis.push(data)
+            //       }
+
+            //     })
+            //   })
+            // })
+            if (this.pasar.length > 0) {
+              this.store.dispatch(setReparaciones({ reparacion: this.pasar }))
+            }
           }
-        })
+        }
+      })
+
+    setTimeout(() => {
+      this.store.dispatch(startContador())
+      this.store.dispatch(setID({ id: this.repID }))
+
+
+      // if (this.pasarVis.length > 0) {
+      //   this.store.dispatch(setVisibles({ visibles: this.pasarVis }))
+      //   console.log(this.pasarVis);
+      //   // console.log("veces");
+      // }
 
       this.segundosActuales = new Date().getTime()
       const diferencia = (this.segundosActuales - this.segundosFB) / 1000

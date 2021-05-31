@@ -25,7 +25,9 @@ export class HistoricoComponent implements OnInit, OnDestroy {
       title: 'Espere por favor',
       didOpen: () => {
         Swal.showLoading()
-      }
+      },
+      allowOutsideClick: false
+
     })
     setTimeout(() => {
       this.store.select("items")

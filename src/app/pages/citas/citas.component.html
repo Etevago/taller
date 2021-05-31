@@ -1,4 +1,4 @@
-<div class='demo-app text-center'>
+<div class='demo-app text-center' *ngIf="!cargando">
     <div *ngIf="!siguiente">
         <section class="wrap">
             <a class="navbar-brand" id="head">
@@ -42,20 +42,18 @@
 <ng-template #content let-c="close" let-d="dismiss">
     <div class="modal-header">
         <h4 class="modal-title" id="modal-basic-title">Selecciona hora para tu cita</h4>
-        <!-- <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button> -->
+
     </div>
     <div class="modal-body">
         <form>
-            <label for="hora">Elige tu hora: &nbsp;</label>
-            <select name="hora" id="hora" #hora>
-                <option *ngFor="let hora of horas" value="hora">{{hora}}</option>
+            <label for="hora">Elige tu hora para la cita del {{fecha | date: 'dd/MM/yyyy'}}: &nbsp;</label>
+            <select name="horaSeleccionada" id="horaSeleccionada" #horaSeleccionada>
+                <option *ngFor="let hora of horas" [value]="hora">{{hora}}</option>
             </select>
         </form>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-dark" (click)="c('Save click')">Confirmar</button>
+        <button type="button" class="btn btn-outline-dark" (click)="c(horaSeleccionada.value)">Confirmar</button>
         <!-- <button type="submit" class="btn btn-outline-dark">Guardar</button> -->
 
     </div>

@@ -1,27 +1,24 @@
 import { DashboardService } from './../../dashboard/dashboard.service';
 import { CitaService } from './../../services/cita.service';
 import { Router } from '@angular/router';
-import { startCita, stopCita, setContador } from './../progreso/progreso.actions';
+import { startCita, setContador } from './../progreso/progreso.actions';
 import Swal from 'sweetalert2';
-import { setReparaciones } from '../progreso/progreso.actions';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { AppState } from '../../app.reducer';
 import { filter, takeUntil } from 'rxjs/operators';
 import { CalendarService } from '../../services/calendar.service';
 import { Subject } from 'rxjs';
 import { Component, OnDestroy, OnInit, ViewEncapsulation, ElementRef, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
+import { CalendarOptions, DateSelectArg, EventApi } from '@fullcalendar/angular';
 import esLocale from '@fullcalendar/core/locales/es';
 import { FormControl } from '@angular/forms';
 import { setPago } from '../progreso/progreso.actions';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
-import { exit } from 'process';
 
 interface Opcion {
   value: string;
-  price: number
+  price: number;
 }
 
 interface OpcionGroup {
@@ -41,7 +38,7 @@ interface OpcionGroup {
 export class CitasComponent implements OnInit, OnDestroy {
 
   @ViewChild('content') content: ElementRef;
-  @Input() public hora;
+  @Input() public horaSeleccionada;
 
   private unsubscribe: Subject<void> = new Subject();
   hora2;
@@ -50,6 +47,7 @@ export class CitasComponent implements OnInit, OnDestroy {
   pagoTotal = 0;
   suma = 0;
   cita = false;
+  cargando = true
   nombre: string;
   uid: string;
   coleccion;
@@ -58,72 +56,76 @@ export class CitasComponent implements OnInit, OnDestroy {
   selected: any[] = []
   arrayItems = []
   horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"]
-  itemId: string
+  itemId: string;
+  sumaFinal;
+  fecha;
+  bien = true
 
-  constructor(private store: Store<AppState>, private calendarS: CalendarService, private citaS: CitaService, private router: Router, private modalService: NgbModal, config: NgbModalConfig, private ds: DashboardService) {
+  constructor(private store: Store<AppState>, private calendarS: CalendarService, private router: Router, private modalService: NgbModal, config: NgbModalConfig, private ds: DashboardService) {
     config.backdrop = 'static';
     config.keyboard = false;
   }
 
   ngOnInit(): void {
+    Swal.fire({
+      title: 'Espere por favor',
+      didOpen: () => {
+        Swal.showLoading()
+      },
+      allowOutsideClick: false
 
-    this.selected.forEach(option => {
-      this.suma += option.price
-    });
+    })
+    setTimeout(() => {
 
-    this.store.select("user")
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({ user }) => {
-        this.nombre = user?.nombre
-        this.uid = user?.uid
+      this.selected.forEach(option => {
+        this.suma += option.price
       });
 
-    this.store.select("items")
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({ calendar }) => {
-        calendar.forEach(item => {
-          this.arrayItems.push(item)
+      this.store.select("user")
+        .pipe(takeUntil(this.unsubscribe),
+          filter(auth => auth.user != null)
+        )
+        .subscribe(({ user }) => {
+          this.nombre = user?.nombre
+          this.uid = user?.uid
+          this.calendarS.initCalendarListener(user.uid)
+            .pipe(takeUntil(this.unsubscribe))
+            .subscribe((calendarFB: any) => {
+              calendarFB.forEach(fecha => {
+                this.iniciales.push(fecha.data)
+              });
+              this.calendarOptions.events = this.iniciales
+            })
         });
-      })
 
-    this.store.select("contador")
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((res) => {
-        this.pagoTotal = res.pago
-        // if (res.reparaciones.length > 0) this.selected = res.reparaciones;
-        this.cita = res.cita
-      });
-  }
-
-  eventos = this.store.select("user")
-    .pipe(
-      takeUntil(this.unsubscribe),
-      filter(auth => auth.user != null)
-    )
-    .subscribe(
-      ({ user }) => this.calendarS.initCalendarListener(user.uid)
+      this.store.select("items")
         .pipe(takeUntil(this.unsubscribe))
-        .subscribe((calendarFB: any) => {
-          calendarFB.forEach(fecha => {
-            this.iniciales.push(fecha.data)
+        .subscribe(({ calendar }) => {
+          calendar.forEach(item => {
+            this.arrayItems.push(item)
           });
-          this.calendarOptions.events = this.iniciales
         })
-    );
 
-  open(content) {
-    this.modalService.open(content);
+      this.store.select("contador")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe((res) => {
+          this.cita = res.cita
+        });
+      Swal.close()
+      this.cargando = false
+    }, 1000);
+
   }
 
   confirmar() {
     let suma = 0;
-    let sumaFinal = "";
+    this.sumaFinal = "";
     this.selected.forEach((opcion: Opcion) => {
       suma += opcion.price
     });
-    sumaFinal = suma.toFixed(2)
+    this.sumaFinal = suma.toFixed(2)
     Swal.fire({
-      title: 'Pago total: ' + sumaFinal + "€",
+      title: 'Pago total: ' + this.sumaFinal + "€",
       text: "¿Quiéres confirmar tu cita?",
       icon: 'warning',
       showCancelButton: true,
@@ -162,7 +164,6 @@ export class CitasComponent implements OnInit, OnDestroy {
     selectMirror: true,
     dayMaxEvents: true,
     select: this.handleDateSelect.bind(this),
-    eventClick: this.handleEventClick.bind(this),
     eventsSet: this.handleEvents.bind(this)
   };
 
@@ -170,93 +171,81 @@ export class CitasComponent implements OnInit, OnDestroy {
     this.siguiente = false;
   }
 
-  async getEventId(title: string) {
-    let fecha = ""
-    return new Promise<any>(res => {
-      setTimeout(() => {
-        for (let i = 0; i < this.arrayItems.length; i++) {
-          if (this.arrayItems[i].data.title === title) {
-            fecha = this.arrayItems[i].uid
-          }
-        }
-        res(fecha);
-      }, 100);
-    });
-  }
-
-
   async handleDateSelect(selectInfo: DateSelectArg) {
     let hoy = new Date().getDate().toString()
     let diaFecha = selectInfo.startStr.substr(8, 2)
+    this.fecha = selectInfo.startStr
     if (!moment().isBefore(selectInfo.startStr) && (hoy != diaFecha)) {
-      return;
-    }
-    // this.modalService.open(this.content)
-    // const modalRef = this.modalService.open(this.content, { size: 'lg' });
-    // modalRef.componentInstance.hora = this.hora;
-    // modalRef.result.then((result) => {
-    //     if (result) {                
-    //         console.log("trueeee");
-    //     }
-    // },
-    //     (reason) => { })
-    // console.log(this.content.nativeElement);
-    const title = "Reparación " + this.nombre + Math.random() * 102012
-    let idApi = "a";
-    this.getEventId(title).then(value => {
-      idApi = value
-      // console.log("value" + value);
-    })
-
-    const calendarApi = selectInfo.view.calendar;
-
-    calendarApi.unselect(); // clear date selection
-    if (title) {
-      this.calendarS.crearFecha({
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay,
-        finalizada: false,
-        reparaciones: this.selected,
-        visibles: [],
-        pagada: false
-      });
-      console.log("api" + idApi);
-
-      calendarApi.addEvent({
-        id: idApi,
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay
-      });
+      this.bien = false
+      return
+    } else {
+      this.bien = true
     }
 
-    this.selected.forEach((opcion: Opcion) => {
-      this.pagoTotal += opcion.price
+    this.arrayItems.forEach(reparacion => {
+      if (this.bien == false) return
+      if (reparacion.data.start == selectInfo.startStr) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'El dia seleccionado ya esta completo',
+        })
+        this.bien = false
+        return
+      } else {
+        this.bien = true
+      }
     });
-    let pagoFinal = 0;
-    pagoFinal = Math.round(this.pagoTotal * 1e2) / 1e2
 
-    this.cita = true;
-    this.store.dispatch(setPago({ pago: pagoFinal }))
-    // this.store.dispatch(setReparaciones({ reparacion: this.selected }))
-    // this.citaS.crearCita(this.selected)
-    this.store.dispatch(startCita())
-    this.store.dispatch(setContador({ actual: 0 }))
-    // this.ds.reparacionReiniciar()
-    this.router.navigate(["progreso"])
+    if (this.bien) {
 
-  }
+      // this.modalService.open(this.content)
+      const modalRef = this.modalService.open(this.content);
+      modalRef.result.then((result) => {
+        if (result) {
 
-  handleEventClick(clickInfo: EventClickArg) {
-    if (confirm(`¿Seguro que quieres eliminar tu cita? '${clickInfo.event.title}'`)) {
-      clickInfo.event.remove();
-      console.log(clickInfo.event.id);
-      // this.calendarS.borrarFecha(clickInfo.event.id)
+          const title = "Reparación " + this.nombre + " " + result
+          let idApi = (Math.random() * 999999).toString();
+
+          const calendarApi = selectInfo.view.calendar;
+
+          calendarApi.unselect();
+          this.calendarS.crearFecha({
+            title,
+            start: selectInfo.startStr,
+            end: selectInfo.endStr,
+            allDay: selectInfo.allDay,
+            finalizada: false,
+            reparaciones: this.selected,
+            pagada: false,
+            visibles: [],
+            costeTotal: this.sumaFinal
+          });
+
+          calendarApi.addEvent({
+            id: idApi,
+            title,
+            start: selectInfo.startStr,
+            end: selectInfo.endStr,
+            allDay: selectInfo.allDay
+          });
+
+          this.selected.forEach((opcion: Opcion) => {
+            this.pagoTotal += opcion.price
+          });
+          let pagoFinal = 0;
+          pagoFinal = Math.round(this.pagoTotal * 1e2) / 1e2
+
+          this.cita = true;
+          this.store.dispatch(setPago({ pago: pagoFinal }))
+          this.store.dispatch(startCita())
+          this.store.dispatch(setContador({ actual: 0 }))
+          this.router.navigate(["progreso"])
+        }
+      })
     }
   }
+
 
   handleEvents(events: EventApi[]) {
     this.currentEvents = events;

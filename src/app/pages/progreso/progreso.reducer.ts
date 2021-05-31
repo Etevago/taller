@@ -1,6 +1,6 @@
 import { setUser } from './../../auth/auth.actions';
 import { createReducer, on } from '@ngrx/store';
-import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago, setReparaciones, stopCita, startCita, setID, setVisibles } from './progreso.actions';
+import { contador, setContador, reparar, stopReparar, stopContador, startContador, setPago, setReparaciones, stopCita, startCita, setID, setVisibles, setTitulo, setDia } from './progreso.actions';
 
 export interface State {
     cont: number
@@ -12,6 +12,8 @@ export interface State {
     visibles: any[]
     cita: boolean;
     id: string
+    titulo: string
+    dia: string
 }
 
 export const initialState: State = {
@@ -23,7 +25,9 @@ export const initialState: State = {
     reparacion: [],
     visibles: [],
     cita: false,
-    id: ""
+    id: "",
+    titulo: "",
+    dia: ""
 }
 
 const _contadorReducer = createReducer(initialState,
@@ -41,6 +45,8 @@ const _contadorReducer = createReducer(initialState,
     on(stopCita, state => ({ ...state, cita: false })),
     on(setUser, (state, { user }) => ({ ...state, user: user.uid })),
     on(setID, (state, { id }) => ({ ...state, id: id })),
+    on(setTitulo, (state, { titulo }) => ({ ...state, titulo: titulo })),
+    on(setDia, (state, { dia }) => ({ ...state, dia: dia })),
 
 
 

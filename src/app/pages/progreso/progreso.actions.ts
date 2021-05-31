@@ -13,3 +13,5 @@ export const startCita = createAction('[Cita] Empezar cita');
 export const stopCita = createAction('[Cita] Eliminar cita');
 export const setUser = createAction('[User] Establecer usuario', props<{ user: string }>());
 export const setID = createAction('[Reparacion] Establecer ID reparacion', props<{ id: string }>());
+export const setTitulo = createAction('[Reparacion] Establecer ID reparacion', props<{ titulo: string }>());
+export const setDia = createAction('[Reparacion] Establecer ID reparacion', props<{ dia: string }>());

@@ -46,11 +46,8 @@ export class DashboardService {
 
   stopReparacion() {
     const uid = this.authService.user.uid
-
     this.firestore.doc(`${uid}/usuario`).update({ reparando: false })
     this.store.dispatch(stopReparar())
-
-
   }
 
 }

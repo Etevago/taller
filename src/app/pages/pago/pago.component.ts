@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -16,37 +17,49 @@ import { AppState } from 'src/app/app.reducer';
 export class PagoComponent implements OnInit, OnDestroy {
   private unsubscribe: Subject<void> = new Subject();
 
-  tallerForm: FormGroup;
-  cargando: boolean = false;
+  cargando = true;
   loadingSubs: Subscription;
   pagoTotal: number
   pago: string;
-
+  cita: boolean;
   public payPalConfig?: IPayPalConfig;
   showSuccess: boolean;
+  reparaciones = [];
 
-  constructor(private fb: FormBuilder,
+  constructor(
+    private fb: FormBuilder,
     private store: Store<AppState>,
   ) { }
 
   ngOnInit() {
-    this.initConfig();
+    Swal.fire({
+      title: 'Espere por favor',
+      didOpen: () => {
+        Swal.showLoading()
+      },
+      allowOutsideClick: false
 
+    })
+    setTimeout(() => {
+      this.initConfig();
+      this.store.select("contador")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe((cont) => {
+          this.pagoTotal = cont.pago
+          this.cita = cont.cita
+        });
 
-    this.store.select('ui')
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({ isLoading }) => this.cargando = isLoading);
+      this.store.select("items")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe(({ calendar }) => {
+          this.reparaciones = calendar
+        });
 
-    this.tallerForm = this.fb.group({
-      descripcion: ['', Validators.required],
-      cantidad: ['', Validators.required],
-    });
+      this.pago = this.pagoTotal.toFixed(2).toString()
+      Swal.close()
+      this.cargando = false
+    }, 1000);
 
-    this.store.select("contador")
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe(({ pago }) => this.pagoTotal = pago);
-
-    this.pago = this.pagoTotal.toFixed(2).toString()
   }
 
   ngOnDestroy() {

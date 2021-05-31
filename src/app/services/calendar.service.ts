@@ -2,8 +2,10 @@ import { map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { Fecha } from './../models/fecha.model';
 import { Injectable } from '@angular/core';
+import * as Firebase from 'firebase/app';
 
-import 'firebase/firestore';
+
+import 'firebase/firestore' ;
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 import { AppState } from '../app.reducer';
@@ -13,12 +15,12 @@ import { AppState } from '../app.reducer';
   providedIn: 'root'
 })
 export class CalendarService {
-
   uid: string
 
   constructor(private firestore: AngularFirestore,
     private authService: AuthService,
-    private store: Store<AppState>) { }
+    private store: Store<AppState>,
+    ) { }
 
   crearFecha(fecha: Fecha) {
     const uid = this.authService.user.uid;
@@ -39,10 +41,10 @@ export class CalendarService {
       .update({ finalizada: true })
   }
 
-  updateVisibles(idFecha:string, visibles:any[]){
+  updateVisibles(idFecha: string, nuevo) {
     const uid = this.authService.user.uid;
     this.firestore.doc(`${uid}/calendar/items/${idFecha}`)
-    .update({ visibles: visibles })
+      .update({ visibles: Firebase.default.firestore.FieldValue.arrayUnion(nuevo) })
   }
 
   initCalendarListener(uid: string) {

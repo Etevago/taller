@@ -2,10 +2,12 @@
     <h1 style="text-align: center;" *ngIf="finalizadas.length>0"><b>Reparaciones completadas</b></h1>
     <h1 style="text-align: center;" *ngIf="finalizadas.length==0"><b>Actualmente no tienes ninguna cita completada</b></h1>
     <ul *ngFor="let item of finalizadas; let i = index">
-        <h3>{{item.data.title}}</h3>
+        <h3>{{item.data.title}} {{item.data.start | date: 'dd/MM/yyyy'}}</h3>
         <ul *ngFor="let rep of item.data.reparaciones;">
             <li><b>{{rep.value | select}}</b> {{rep.price}}€</li>
         </ul>
+        <br>
         <h4>Total: {{total[i] | number: '1.0-2'}}€</h4>
+        <hr>
     </ul>
 </div>
