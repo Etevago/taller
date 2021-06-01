@@ -1,0 +1,11 @@
+.clearfix {
+    float: none;
+    clear: both;
+}
+
+.head {
+    overflow: hidden;
+    margin: -20px -200px 22px 300px;
+    float: left;
+    text-align: center;
+}

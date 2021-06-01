@@ -14,7 +14,18 @@ import { Subject } from 'rxjs';
   selector: 'app-estadistica',
   templateUrl: './progreso.component.html',
   styles: [
-
+    `
+  .clearfix {
+    float: none;
+    clear: both;
+  }
+  .head {
+    overflow: hidden;
+    margin: -20px -200px 22px 300px;
+    float: left;
+    text-align: center;
+  }
+    `
   ]
 })
 export class ProgresoComponent implements OnInit, OnDestroy {

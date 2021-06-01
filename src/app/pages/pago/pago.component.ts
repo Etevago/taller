@@ -13,7 +13,21 @@ import { AppState } from 'src/app/app.reducer';
 @Component({
   selector: 'app-pago',
   templateUrl: './pago.component.html',
-  styles: []
+  styles: [
+    `
+  .clearfix {
+    float: none;
+    clear: both;
+  }
+
+  .head {
+    overflow: hidden;
+    margin: -20px -200px 22px 300px;
+    float: left;
+    text-align: center;
+  }
+    `
+  ]
 })
 export class PagoComponent implements OnInit, OnDestroy {
   private unsubscribe: Subject<void> = new Subject();

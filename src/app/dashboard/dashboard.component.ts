@@ -2,7 +2,7 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CalendarService } from './../services/calendar.service';
 import { CitaService } from './../services/cita.service';
-import { setCalendar } from './items.actions';
+import { setCalendar, setGeneral } from './items.actions';
 import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles, setTitulo, setDia, stopReparar, stopContador } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -48,7 +48,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .subscribe((calendar: any) => {
               this.store.dispatch(setCalendar({ items: calendar }))
               this.store.dispatch(setUser({ user: user.uid }))
-            })
+            });
+
+          this.calendarS.initGeneral()
+            .subscribe((items: any) => {
+              this.store.dispatch(setGeneral({ items: items }))
+            });
 
           this.segundosFB = user?.tiempo
           this.contador = user?.contador

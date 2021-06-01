@@ -55,6 +55,7 @@ export class CitasComponent implements OnInit, OnDestroy {
   iniciales = [];
   selected: any[] = []
   arrayItems = []
+  arrayGeneral = []
   horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"]
   itemId: string;
   sumaFinal;
@@ -100,10 +101,14 @@ export class CitasComponent implements OnInit, OnDestroy {
 
       this.store.select("items")
         .pipe(takeUntil(this.unsubscribe))
-        .subscribe(({ calendar }) => {
-          calendar.forEach(item => {
+        .subscribe((items) => {
+          items.calendar.forEach(item => {
             this.arrayItems.push(item)
           });
+          items.general.forEach(item => {
+            this.arrayGeneral.push(item)
+          });
+
         })
 
       this.store.select("contador")
@@ -145,6 +150,8 @@ export class CitasComponent implements OnInit, OnDestroy {
     })
   }
 
+
+
   calendarVisible = true;
   calendarOptions: CalendarOptions = {
     headerToolbar: {
@@ -167,6 +174,8 @@ export class CitasComponent implements OnInit, OnDestroy {
     eventsSet: this.handleEvents.bind(this)
   };
 
+
+
   atras() {
     this.siguiente = false;
   }
@@ -183,6 +192,21 @@ export class CitasComponent implements OnInit, OnDestroy {
     }
 
     this.arrayItems.forEach(reparacion => {
+      if (this.bien == false) return
+      if (reparacion.data.start == selectInfo.startStr) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'El dia seleccionado ya esta completo',
+        })
+        this.bien = false
+        return
+      } else {
+        this.bien = true
+      }
+    });
+
+    this.arrayGeneral.forEach(reparacion => {
       if (this.bien == false) return
       if (reparacion.data.start == selectInfo.startStr) {
         Swal.fire({

@@ -1,14 +1,12 @@
 import { map } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
 import { Fecha } from './../models/fecha.model';
 import { Injectable } from '@angular/core';
 import * as Firebase from 'firebase/app';
 
 
-import 'firebase/firestore' ;
+import 'firebase/firestore';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
-import { AppState } from '../app.reducer';
 
 
 @Injectable({
@@ -19,11 +17,13 @@ export class CalendarService {
 
   constructor(private firestore: AngularFirestore,
     private authService: AuthService,
-    private store: Store<AppState>,
-    ) { }
+  ) { }
 
   crearFecha(fecha: Fecha) {
     const uid = this.authService.user.uid;
+    this.firestore.collection(`general/items/citas`)
+      .add({ ...fecha });
+
     return this.firestore.collection(`${uid}/calendar/items`)
       .add({ ...fecha });
 
@@ -67,4 +67,20 @@ export class CalendarService {
         })
       )
   }
+
+  initGeneral() {
+    return this.firestore.collection(`general/items/citas`)
+      .snapshotChanges()
+      .pipe(
+        map(snapshot => {
+          return snapshot.map(doc => {
+            return {
+              uid: doc.payload.doc.id,
+              data: doc.payload.doc.data()
+            }
+          })
+        })
+      )
+  }
+
 }

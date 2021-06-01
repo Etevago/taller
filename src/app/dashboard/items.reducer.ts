@@ -1,10 +1,11 @@
 import { Fecha } from './../models/fecha.model';
-import { setCalendar, unSetCalendar } from './items.actions';
+import { setCalendar, unSetCalendar, setGeneral } from './items.actions';
 import { createReducer, on } from '@ngrx/store';
 import { AppState } from '../app.reducer';
 
 export interface State {
     calendar: Fecha[];
+    general: Fecha[];
 }
 
 export interface AppStateCalendar extends AppState {
@@ -13,11 +14,13 @@ export interface AppStateCalendar extends AppState {
 
 export const initialState: State = {
     calendar: [],
+    general: [],
 }
 
 const _itemsReducer = createReducer(initialState,
 
     on(setCalendar, (state, { items }) => ({ ...state, calendar: [...items] })),
+    on(setGeneral, (state, { items }) => ({ ...state, general: [...items] })),
     on(unSetCalendar, (state) => ({ ...state, calendar: [] })),
 );
 

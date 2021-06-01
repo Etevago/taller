@@ -1,8 +1,12 @@
 <div style="text-align:center" *ngIf="!cargando">
-
-    <h2>Puedes pagar on-line o en nuestro taller</h2>
-    <br>
     <div *ngIf="reparaciones.length>0 ">
+        <section class="wrap">
+            <a class="navbar-brand head">
+                <img src="assets/images/repara.png" alt="logo" />
+            </a>
+            <h1 class="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">Puedes pagar on-line o en nuestro taller</h1>
+        </section>
+        <br class="clearfix">
         <h4>Selecciona una reparación</h4>
         <mat-form-field appearance="fill">
             <mat-label>Reparación</mat-label>
@@ -19,9 +23,15 @@
 
     </div>
     <div *ngIf="reparaciones.length==0">
-        <h3>No tienes ninguna cita pendiente de pago</h3>
-        <a routerLink="citas">
-            <h4>Puedes pedir cita aquí</h4>
+        <section class="wrap">
+            <a class="navbar-brand head">
+                <img src="assets/images/repara.png" alt="logo" />
+            </a>
+            <h1 class="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">No tienes ninguna cita pendiente de pago</h1>
+        </section>
+        <br class="clearfix">
+        <a routerLink="citas" style="text-align: center;margin-top: 100px;">
+            <h2>Puedes pedir cita aquí</h2>
         </a>
     </div>
 

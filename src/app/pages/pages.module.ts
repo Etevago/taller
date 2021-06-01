@@ -11,18 +11,18 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgxPayPalModule } from 'ngx-paypal';
-import { FullCalendarModule } from '@fullcalendar/angular'; // the main connector. must go first
-import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin
-import interactionPlugin from '@fullcalendar/interaction'; // a plugin
+import { FullCalendarModule } from '@fullcalendar/angular';
+import dayGridPlugin from '@fullcalendar/daygrid'; 
+import interactionPlugin from '@fullcalendar/interaction'; 
 import { SelectPipe } from '../pipes/select.pipe';
 import { HistoricoComponent } from './historico/historico.component';
+import { ChartsModule } from 'ng2-charts';
+import { GraficoComponent } from './grafico/grafico.component';
 
-FullCalendarModule.registerPlugins([ // register FullCalendar plugins
+FullCalendarModule.registerPlugins([
   dayGridPlugin,
   interactionPlugin
 ]);
-
-
 
 @NgModule({
   declarations: [
@@ -32,6 +32,7 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     ProgresoComponent,
     HistoricoComponent,
     SelectPipe,
+    GraficoComponent,
   ],
   imports: [
     CommonModule,
@@ -42,8 +43,8 @@ FullCalendarModule.registerPlugins([ // register FullCalendar plugins
     NgxPayPalModule,
     FullCalendarModule,
     MatSelectModule,
-    FormsModule
-
+    FormsModule,
+    ChartsModule
   ],
   exports: [
 

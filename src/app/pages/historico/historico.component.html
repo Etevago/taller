@@ -1,6 +1,26 @@
 <div *ngIf="!cargando" class="wrapper">
-    <h1 style="text-align: center;" *ngIf="finalizadas.length>0"><b>Reparaciones completadas</b></h1>
-    <h1 style="text-align: center;" *ngIf="finalizadas.length==0"><b>Actualmente no tienes ninguna cita completada</b></h1>
+
+
+    <section class="wrap" *ngIf="finalizadas.length>0">
+        <a class="navbar-brand head">
+            <img src="assets/images/repara.png" alt="logo" />
+        </a>
+        <h1 class="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">Reparaciones completadas</h1>
+    </section>
+    <br class="clearfix">
+
+    <section class="wrap" *ngIf="finalizadas.length==0">
+        <a class="navbar-brand head">
+            <img src="assets/images/repara.png" alt="logo" />
+        </a>
+        <h1 class="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">Actualmente no tienes ninguna cita completada</h1>
+        <br class="clearfix">
+        <a routerLink="/progreso" style="text-align: center;margin-top: 100px;">
+            <h2>Puedes ver si tienes alguna reparación en curso aquí</h2>
+        </a>
+    </section>
+    <br class="clearfix">
+
     <ul *ngFor="let item of finalizadas; let i = index">
         <h3>{{item.data.title}} {{item.data.start | date: 'dd/MM/yyyy'}}</h3>
         <ul *ngFor="let rep of item.data.reparaciones;">

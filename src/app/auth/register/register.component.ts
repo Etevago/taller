@@ -56,7 +56,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   crearUsuario() {
-    if (this.registro.invalid) {
+    if (this.registro.invalid || this.pass2NoValido) {
       return
     }
     this.store.dispatch(ui.isLoading())
@@ -67,20 +67,26 @@ export class RegisterComponent implements OnInit, OnDestroy {
       }
     })
 
-    const { nombre, email, password } = this.registro.value
-    this.auth.crearUsuario(nombre, email, password)
+    const { nombre, email, pass1 } = this.registro.value
+    this.auth.crearUsuario(nombre, email, pass1)
       .then(() => {
         Swal.close()
         this.store.dispatch(ui.stopLoading())
         this.router.navigate(["/"])
       })
       .catch(error => {
+        let mensaje;
+        if (error.code=="auth/email-already-in-use"){
+          mensaje="El email introducido ya está siendo utilizado"
+        } 
+        else {
+          mensaje=error.message
+        }
         this.store.dispatch(ui.stopLoading())
-        console.log(error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: error.message,
+          text: mensaje,
         })
       })
   }

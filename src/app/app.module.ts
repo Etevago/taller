@@ -33,8 +33,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     NoopAnimationsModule,
     BrowserAnimationsModule,
     NgbModule,
-
-
   ],
   providers: [],
   bootstrap: [AppComponent]

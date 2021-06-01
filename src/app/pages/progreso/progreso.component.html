@@ -1,9 +1,14 @@
 <div class="wrapper" *ngIf="!cargando">
-    <a class="navbar-brand" id="head">
-        <img src="assets/images/repara.png" alt="logo" />
-    </a>
-    <section *ngIf="cita">
-        <h3>{{titulo}} {{dia | date: 'dd/MM/yyyy'}}</h3>
+    <div *ngIf="cita">
+        <section class="wrap">
+            <a class="navbar-brand head">
+                <img src="assets/images/repara.png" alt="logo" />
+            </a>
+            <h1 class="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">{{titulo}} {{dia | date: 'dd/MM/yyyy'}}</h1>
+        </section>
+        <br class="clearfix">
+
+        <!-- <h2><b></b></h2> -->
         <button [disabled]="reparando" class="btn" (click)="reparar()">Reparar</button>
 
         <div class="row m-5">
@@ -22,12 +27,18 @@
                 </ul>
             </div>
         </div>
-    </section>
+    </div>
 
     <div *ngIf="!cita">
-        <h3>No tienes ninguna cita</h3>
+        <section class="wrap">
+            <a class="navbar-brand head">
+                <img src="assets/images/repara.png" alt="logo" />
+            </a>
+            <h1 class="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">No tienes ninguna cita</h1>
+        </section>
+        <br class="clearfix">
         <a routerLink="citas">
-            <h4>Puedes pedir cita aquí</h4>
+            <h2 style="text-align: center">Puedes pedir cita aquí</h2>
         </a>
     </div>
 </div>
