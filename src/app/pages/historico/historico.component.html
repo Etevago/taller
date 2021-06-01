@@ -8,6 +8,8 @@
         </ul>
         <br>
         <h4>Total: {{total[i] | number: '1.0-2'}}€</h4>
+        <h3 *ngIf="item.data.pagada">Pagada: Sí</h3>
+        <h3 *ngIf="!item.data.pagada">Pagada: No</h3>
         <hr>
     </ul>
 </div>

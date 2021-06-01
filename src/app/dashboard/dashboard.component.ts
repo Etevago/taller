@@ -1,7 +1,9 @@
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { CalendarService } from './../services/calendar.service';
 import { CitaService } from './../services/cita.service';
 import { setCalendar } from './items.actions';
-import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles, setTitulo, setDia } from './../pages/progreso/progreso.actions';
+import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles, setTitulo, setDia, stopReparar, stopContador } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -32,7 +34,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   dia: string
   pasar = []
   pasarVis = []
-  constructor(private store: Store<AppState>, private ds: DashboardService, private calendarS: CalendarService, private citaS: CitaService) { }
+  constructor(private store: Store<AppState>, private ds: DashboardService, private calendarS: CalendarService, private router: Router) { }
 
   ngOnInit(): void {
     this.store.select("user")
@@ -118,6 +120,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
               this.store.dispatch(setReparaciones({ reparacion: this.pasar }))
             }
           }
+        } else {
+          this.store.dispatch(setReparaciones({ reparacion: [] }))
+          this.store.dispatch(setVisibles({ visibles: [] }))
         }
       })
 
@@ -131,41 +136,87 @@ export class DashboardComponent implements OnInit, OnDestroy {
       //   console.log(this.pasarVis);
       //   // console.log("veces");
       // }
-
-      this.segundosActuales = new Date().getTime()
-      const diferencia = (this.segundosActuales - this.segundosFB) / 1000
-      this.contador += diferencia
-
       if (this.reparando) {
+        this.segundosActuales = new Date().getTime()
+        const diferencia = (this.segundosActuales - this.segundosFB) / 1000
+        this.contador += diferencia
         this.store.dispatch(reparar())
         this.store.dispatch(setContador({ actual: this.contador }))
-        this.store.select("contador").subscribe(params => {
-          this.parar = params.parar
-        })
-
-
-        if (this.reparando) {
-          this.store.select("contador")
-            .pipe(takeUntil(this.unsubscribe))
-            .subscribe((res) => {
-              this.contador = res.cont
-            });
-          const intervalo = setInterval(() => {
-
-            if (this.contador >= 100) {
-              this.ds.reparacionCompleta()
-              this.ds.stopReparacion();
-              clearInterval(intervalo);
-            }
-            else if (this.parar) {
-              this.ds.stopReparacion();
-              clearInterval(intervalo);
-            }
-
-            this.store.dispatch(contador())
-          }, 1000)
-        }
       }
+      this.store.select("contador")
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe((cont) => {
+          if (cont.visibles.length > 0) {
+            this.visibles = cont.visibles
+          }
+          this.parar = cont.parar
+          // this.reparando = cont.reparando
+          this.contador = Number(cont.cont.toFixed())
+          this.reparaciones = cont.reparacion
+          const x = this.contador * this.reparaciones.length / 100;
+          const rep = this.reparaciones[(x) - 1];
+          const repDec = this.reparaciones[Number((this.contador * this.reparaciones.length / 100).toFixed()) - 1]
+
+          if (this.contador >= 100) {
+            this.visibles = this.reparaciones
+            this.calendarS.finalizarFecha(cont.id)
+            Swal.fire({
+              icon: 'success',
+              title: 'Completada',
+              text: '¡La reparación ha sido completada con éxito!',
+            })
+            this.store.dispatch(stopReparar())
+            this.store.dispatch(stopContador())
+            this.ds.reparacionReiniciar()
+            this.ds.stopReparacion()
+            this.store.dispatch(setContador({ actual: 0 }))
+            this.store.dispatch(setVisibles({ visibles: [] }))
+            setTimeout(() => {
+              this.router.navigate(["pago"])
+              this.store.dispatch(setContador({ actual: 0 }))
+            }, 1100);
+          }
+
+          if ((repDec != undefined) && (!this.visibles.find(param => param == repDec)) &&
+            ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
+            this.visibles = Object.assign([], this.visibles)
+            this.visibles.push(repDec);
+            // this.calS.updateVisibles(this.id, repDec)
+            this.store.dispatch(setVisibles({ visibles: this.visibles }))
+          } else if ((rep != undefined) && (!this.visibles.find(param => param == rep)) &&
+            ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
+            this.visibles = Object.assign([], this.visibles)
+            this.visibles.push(rep);
+            // this.calS.updateVisibles(this.id, rep)
+            this.store.dispatch(setVisibles({ visibles: this.visibles }))
+          }
+          // console.log(this.visibles);
+        });
+
+      if (this.reparando) {
+        this.store.select("contador")
+          .pipe(takeUntil(this.unsubscribe))
+          .subscribe((res) => {
+            this.contador = res.cont
+          });
+        const intervalo = setInterval(() => {
+
+          if (this.contador >= 100) {
+            this.ds.reparacionCompleta()
+            this.ds.stopReparacion();
+            clearInterval(intervalo);
+          }
+          else if (this.parar) {
+            // this.ds.stopReparacion();
+            clearInterval(intervalo);
+          }
+
+          this.store.dispatch(contador())
+        }, 1000)
+      } else {
+        this.store.dispatch(setContador({ actual: 0 }))
+      }
+
     }, 1000);
 
   }

@@ -1,3 +1,4 @@
+import { CalendarService } from './../../services/calendar.service';
 import Swal from 'sweetalert2';
 import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -25,10 +26,12 @@ export class PagoComponent implements OnInit, OnDestroy {
   public payPalConfig?: IPayPalConfig;
   showSuccess: boolean;
   reparaciones = [];
+  selected;
 
   constructor(
     private fb: FormBuilder,
     private store: Store<AppState>,
+    private calS: CalendarService
   ) { }
 
   ngOnInit() {
@@ -45,17 +48,21 @@ export class PagoComponent implements OnInit, OnDestroy {
       this.store.select("contador")
         .pipe(takeUntil(this.unsubscribe))
         .subscribe((cont) => {
-          this.pagoTotal = cont.pago
           this.cita = cont.cita
         });
 
       this.store.select("items")
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(({ calendar }) => {
-          this.reparaciones = calendar
+          this.reparaciones = []
+          calendar.forEach((reparacion: any) => {
+            if (!reparacion.data.pagada) {
+              this.reparaciones.push(reparacion)
+            }
+          });
         });
 
-      this.pago = this.pagoTotal.toFixed(2).toString()
+      this.pago = this.selected?.data.costeTotal.toFixed(2).toString()
       Swal.close()
       this.cargando = false
     }, 1000);
@@ -79,11 +86,11 @@ export class PagoComponent implements OnInit, OnDestroy {
           {
             amount: {
               currency_code: 'EUR',
-              value: this.pago,
+              value: "0.01",
               breakdown: {
                 item_total: {
                   currency_code: 'EUR',
-                  value: this.pago
+                  value: "0.01"
                 }
               }
             },
@@ -94,7 +101,7 @@ export class PagoComponent implements OnInit, OnDestroy {
                 category: 'DIGITAL_GOODS',
                 unit_amount: {
                   currency_code: 'EUR',
-                  value: this.pago,
+                  value: "0.01",
                 },
               }
             ]
@@ -117,9 +124,11 @@ export class PagoComponent implements OnInit, OnDestroy {
       onClientAuthorization: (data) => {
         console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
         this.showSuccess = true;
+        this.calS.pagarFecha(this.selected?.uid)
       },
       onCancel: (data, actions) => {
         console.log('OnCancel', data, actions);
+        this.calS.pagarFecha(this.selected?.uid)
       },
       onError: err => {
         console.log('OnError', err);

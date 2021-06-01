@@ -2,7 +2,7 @@ import Swal from 'sweetalert2';
 import { takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { AppState } from 'src/app/app.reducer';
 
 @Component({
@@ -16,6 +16,25 @@ export class HistoricoComponent implements OnInit, OnDestroy {
   total = []
   cargando = true;
   private unsubscribe: Subject<void> = new Subject();
+
+  
+  basicData: any;
+    
+  basicOptions: any;
+
+  multiAxisData: any;
+
+  chartOptions: any;
+
+  multiAxisOptions: any;
+
+  stackedData: any;
+
+  stackedOptions: any;
+  
+  subscription: Subscription;
+
+  // config: AppConfig;
 
   constructor(private store: Store<AppState>) {
   }

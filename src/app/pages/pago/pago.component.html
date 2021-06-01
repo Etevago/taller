@@ -2,23 +2,23 @@
 
     <h2>Puedes pagar on-line o en nuestro taller</h2>
     <br>
-    <div *ngIf="cita">
+    <div *ngIf="reparaciones.length>0 ">
         <h4>Selecciona una reparación</h4>
         <mat-form-field appearance="fill">
             <mat-label>Reparación</mat-label>
 
             <mat-select [(value)]="selected">
-                <mat-option *ngFor="let item of reparaciones" [value]="item.data.costeTotal">{{item.data.title}} {{item.data.start | date: 'dd/MM/yyyy'}}</mat-option>
+                <mat-option *ngFor="let item of reparaciones" [value]="item">{{item.data.title}} {{item.data.start | date: 'dd/MM/yyyy'}}</mat-option>
             </mat-select>
         </mat-form-field>
 
         <div *ngIf="selected">
-            <h3>El pago total es de {{selected}}€</h3>
+            <h3>El pago total es de {{selected.data.costeTotal}}€</h3>
             <ngx-paypal [config]="payPalConfig"></ngx-paypal>
         </div>
 
     </div>
-    <div *ngIf="!cita">
+    <div *ngIf="reparaciones.length==0">
         <h3>No tienes ninguna cita pendiente de pago</h3>
         <a routerLink="citas">
             <h4>Puedes pedir cita aquí</h4>

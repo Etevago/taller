@@ -41,6 +41,12 @@ export class CalendarService {
       .update({ finalizada: true })
   }
 
+  pagarFecha(idFecha: string) {
+    const uid = this.authService.user.uid;
+    this.firestore.doc(`${uid}/calendar/items/${idFecha}`)
+      .update({ pagada: true })
+  }
+
   updateVisibles(idFecha: string, nuevo) {
     const uid = this.authService.user.uid;
     this.firestore.doc(`${uid}/calendar/items/${idFecha}`)

@@ -41,6 +41,7 @@
     "moment": "^2.29.1",
     "ng2-charts": "^2.4.2",
     "ngx-paypal": "^7.0.0",
+    "primeng": "*",
     "rxjs": "~6.6.0",
     "sweetalert2": "^10.16.0",
     "tslib": "^2.0.0",

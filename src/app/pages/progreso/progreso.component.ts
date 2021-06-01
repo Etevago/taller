@@ -78,9 +78,10 @@ export class ProgresoComponent implements OnInit, OnDestroy {
             this.store.dispatch(setVisibles({ visibles: [] }))
             setTimeout(() => {
               this.router.navigate(["pago"])
+              this.store.dispatch(setContador({ actual: 0 }))
             }, 1000);
           }
-          
+
           if ((repDec != undefined) && (!this.visibles.find(param => param == repDec)) &&
             ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
             this.visibles = Object.assign([], this.visibles)
@@ -111,8 +112,10 @@ export class ProgresoComponent implements OnInit, OnDestroy {
               }
             }
           }
-          this.titulo = calendar[Number(indiceProximo)].data.title
-          this.dia = calendar[Number(indiceProximo)].data.start
+          if (calendar.length > 0) {
+            this.titulo = calendar[Number(indiceProximo)].data.title
+            this.dia = calendar[Number(indiceProximo)].data.start
+          }
         })
       Swal.close()
       this.cargando = false
@@ -130,12 +133,12 @@ export class ProgresoComponent implements OnInit, OnDestroy {
 
       if (this.contador >= 100) {
         this.ds.reparacionCompleta()
-        this.ds.stopReparacion();
+        // this.ds.stopReparacion();
         clearInterval(intervalo);
         return 2;
       }
       else if (this.parar) {
-        this.ds.stopReparacion();
+        // this.ds.stopReparacion();
         clearInterval(intervalo);
       }
 

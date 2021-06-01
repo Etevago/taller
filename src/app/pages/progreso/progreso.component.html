@@ -1,4 +1,7 @@
 <div class="wrapper" *ngIf="!cargando">
+    <a class="navbar-brand" id="head">
+        <img src="assets/images/repara.png" alt="logo" />
+    </a>
     <section *ngIf="cita">
         <h3>{{titulo}} {{dia | date: 'dd/MM/yyyy'}}</h3>
         <button [disabled]="reparando" class="btn" (click)="reparar()">Reparar</button>
