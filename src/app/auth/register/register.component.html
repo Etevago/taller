@@ -10,9 +10,6 @@
                             <div class="input-group">
                                 <input [ngStyle]="{'border': registro.get('nombre').valid ? '3px solid #00ff00' : '1px solid black'}" formControlName="nombre" type="text" class="form-control rounded" placeholder="Nombre">
                                 <div class="input-group-append">
-                                    <!-- <span class="input-group-text"> -->
-                                    <!-- <i *ngIf="registro.get('nombre').valid" class="fa fa-check-circle"></i> -->
-                                    <!-- </span> -->
                                 </div>
                             </div>
                             <p *ngIf="nombreNoValido" class="text-danger">El nombre es necesario</p>
@@ -22,9 +19,6 @@
                             <div class="input-group">
                                 <input [ngStyle]="{'border':registro.get('email').valid? '3px solid #00ff00' : '1px solid black'}" formControlName="email" type="email" class="form-control rounded" placeholder="Correo">
                                 <div class="input-group-append">
-                                    <!-- <span class="input-group-text">
-                      <i *ngIf="!emailNoValido && registro.get('email').touched" class="fa fa-check-circle"></i>
-                    </span> -->
                                 </div>
                             </div>
                             <p *ngIf="emailNoValido" class="text-danger">El formato de correo es erróneo</p>
@@ -34,9 +28,6 @@
                             <div class="input-group">
                                 <input [ngStyle]="{'border':registro.get('pass1').valid ? '3px solid #00ff00' : '1px solid black'}" formControlName="pass1" id="pass1" type="password" class="form-control rounded" placeholder="Contraseña">
                                 <div class="input-group-append">
-                                    <!-- <span class="input-group-text">
-                      <i *ngIf="!pass1NoValido && registro.get('pass1').touched" class="fa fa-check-circle"></i>
-                                    </span> -->
                                 </div>
                             </div>
                             <p *ngIf="pass1NoValido" class="text-danger">La contraseña debe contener un mínimo de 6 caracteres</p>
@@ -46,9 +37,6 @@
                             <div class="input-group">
                                 <input [ngStyle]="{'border': !pass2NoValido ? '3px solid #00ff00' : '1px solid black'}" formControlName="pass2" id="pass2" type="password" class="form-control rounded" placeholder="Repetir contraseña">
                                 <div class="input-group-append">
-                                    <!-- <span class="input-group-text">
-                      <i *ngIf="!pass2NoValido && registro.get('pass2').touched && registro.get('pass2').valid" class="fa fa-check-circle"></i>
-                                    </span> -->
                                 </div>
                             </div>
                             <p *ngIf="pass2NoValido && registro.get('pass2').touched" class="text-danger">Las contraseñas deben coincidir</p>
@@ -70,6 +58,4 @@
             </div>
         </div>
     </div>
-    <!-- content-wrapper ends -->
 </div>
-<!-- page-body-wrapper ends -->

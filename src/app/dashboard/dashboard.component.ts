@@ -1,9 +1,8 @@
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CalendarService } from './../services/calendar.service';
-import { CitaService } from './../services/cita.service';
 import { setCalendar, setGeneral } from './items.actions';
-import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles, setTitulo, setDia, stopReparar, stopContador } from './../pages/progreso/progreso.actions';
+import { setContador, reparar, contador, startContador, setUser, setReparaciones, startCita, setID, setVisibles, stopReparar, stopContador } from './../pages/progreso/progreso.actions';
 import { DashboardService } from './dashboard.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -84,7 +83,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.store.dispatch(startCita())
             const proximo = Number(indiceProximo)
             this.reparaciones = calendar[proximo].data.reparaciones
-            // this.visibles = calendar[proximo].data.visibles
             this.repID = calendar[proximo].uid
             this.dia = calendar[proximo].data.start
             this.titulo = calendar[proximo].data.title
@@ -96,31 +94,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               data[key] = this.reparaciones[key]
               this.pasar.push(data)
             })
-
-            // ARREGLAR 
-            // ESTO
-            // JODER
-            // this.visibles.forEach(element => {
-            //   console.log("element " + element);
-            //   Object.keys(element).forEach(element2 => {
-            //     console.log("element2 " + element2);
-            //     Object.keys(element2).forEach(key => {
-            //       const data = {}
-            //       if (this.visibles.length == 0) {
-            //         data[key] = this.visibles[element2][key]
-            //         console.log("key " + key);
-            //         console.log("entero " + this.visibles[element2][key]);
-            //         this.pasarVis.push(data)
-            //       } else {
-            //         data[this.visibles.length - 1] = this.visibles[element2][this.visibles.length - 1]
-            //         console.log("this.visibles.length-1 " + (this.visibles.length - 1));
-            //         console.log("entero " + this.visibles[element2][this.visibles.length - 1]);
-            //         this.pasarVis.push(data)
-            //       }
-
-            //     })
-            //   })
-            // })
             if (this.pasar.length > 0) {
               this.store.dispatch(setReparaciones({ reparacion: this.pasar }))
             }
@@ -135,12 +108,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.store.dispatch(startContador())
       this.store.dispatch(setID({ id: this.repID }))
 
-
-      // if (this.pasarVis.length > 0) {
-      //   this.store.dispatch(setVisibles({ visibles: this.pasarVis }))
-      //   console.log(this.pasarVis);
-      //   // console.log("veces");
-      // }
       if (this.reparando) {
         this.segundosActuales = new Date().getTime()
         const diferencia = (this.segundosActuales - this.segundosFB) / 1000
@@ -186,16 +153,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
             ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
             this.visibles = Object.assign([], this.visibles)
             this.visibles.push(repDec);
-            // this.calS.updateVisibles(this.id, repDec)
             this.store.dispatch(setVisibles({ visibles: this.visibles }))
           } else if ((rep != undefined) && (!this.visibles.find(param => param == rep)) &&
             ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
             this.visibles = Object.assign([], this.visibles)
             this.visibles.push(rep);
-            // this.calS.updateVisibles(this.id, rep)
             this.store.dispatch(setVisibles({ visibles: this.visibles }))
           }
-          // console.log(this.visibles);
         });
 
       if (this.reparando) {
@@ -205,23 +169,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.contador = res.cont
           });
         const intervalo = setInterval(() => {
-
           if (this.contador >= 100) {
             this.ds.reparacionCompleta()
             this.ds.stopReparacion();
             clearInterval(intervalo);
           }
           else if (this.parar) {
-            // this.ds.stopReparacion();
             clearInterval(intervalo);
           }
-
           this.store.dispatch(contador())
         }, 1000)
       } else {
         this.store.dispatch(setContador({ actual: 0 }))
       }
-
     }, 1000);
 
   }

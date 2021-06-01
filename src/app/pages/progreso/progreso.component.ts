@@ -97,17 +97,15 @@ export class ProgresoComponent implements OnInit, OnDestroy {
             ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
             this.visibles = Object.assign([], this.visibles)
             this.visibles.push(repDec);
-            // this.calS.updateVisibles(this.id, repDec)
             this.store.dispatch(setVisibles({ visibles: this.visibles }))
           } else if ((rep != undefined) && (!this.visibles.find(param => param == rep)) &&
             ((x > (Number(x.toFixed()) - (this.reparaciones.length / 100))))) {
             this.visibles = Object.assign([], this.visibles)
             this.visibles.push(rep);
-            // this.calS.updateVisibles(this.id, rep)
             this.store.dispatch(setVisibles({ visibles: this.visibles }))
           }
-          // console.log(this.visibles);
         });
+
       let indiceProximo = "0"
       this.store.select("items")
         .pipe(takeUntil(this.unsubscribe))
@@ -141,28 +139,22 @@ export class ProgresoComponent implements OnInit, OnDestroy {
     })
 
     const intervalo = setInterval(() => {
-
       if (this.contador >= 100) {
         this.ds.reparacionCompleta()
-        // this.ds.stopReparacion();
         clearInterval(intervalo);
         return 2;
       }
       else if (this.parar) {
-        // this.ds.stopReparacion();
         clearInterval(intervalo);
       }
 
       this.store.dispatch(contador())
     }, 1000)
-
-
   }
 
   ngOnDestroy() {
     this.unsubscribe.next()
     this.unsubscribe.complete()
   }
-
 
 }

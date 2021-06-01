@@ -11,9 +11,6 @@
                             <div class="">
                                 <input formControlName="email" type="email" class="form-control rounded" style="border:1px solid black" placeholder="Email">
                                 <div class="input-group-append">
-                                    <!-- <span class="input-group-text">
-                                    <i *ngIf="login.get('email').valid" class="fa fa-check-circle"></i>
-                                    </span> -->
                                 </div>
                             </div>
                         </div>
@@ -22,9 +19,6 @@
                             <div class="">
                                 <input formControlName="password" type="password" class="form-control rounded" style="border:1px solid black" placeholder="*********">
                                 <div class="input-group-append">
-                                    <!-- <span class="input-group-text">
-                          <i *ngIf="login.get('password').valid" class="fa fa-check-circle"></i>
-                        </span> -->
                                 </div>
                             </div>
                         </div>
@@ -34,8 +28,6 @@
                             <button *ngIf="loading" [disabled]="true" class="btn btn-primary submit-btn btn-block">
                                 <i class="fa fa-spin fa-sync"></i>Espere...</button>
                         </div>
-
-
                         <div class="text-block text-center my-3">
                             <span class="text-small font-weight-semibold">No estas registrado? </span>
                             <br>
@@ -48,5 +40,4 @@
             </div>
         </div>
     </div>
-    <!-- content-wrapper ends -->
 </div>

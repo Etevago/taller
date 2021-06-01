@@ -1,6 +1,6 @@
 import * as auth from './../auth/auth.actions';
 import { Usuario } from './../models/usuario.model';
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { map } from 'rxjs/operators';
 import { AngularFirestore } from '@angular/fire/firestore';

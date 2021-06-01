@@ -1,6 +1,6 @@
 import { stopContador, setContador } from './../../pages/progreso/progreso.actions';
 import { DashboardService } from './../../dashboard/dashboard.service';
-import { map, takeUntil } from 'rxjs/operators';
+import {  takeUntil } from 'rxjs/operators';
 import { AuthService } from './../../services/auth.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';

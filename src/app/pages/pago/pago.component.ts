@@ -2,7 +2,6 @@ import { CalendarService } from './../../services/calendar.service';
 import Swal from 'sweetalert2';
 import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { IPayPalConfig, ICreateOrderRequest } from 'ngx-paypal';
 import { Store } from '@ngrx/store';
 import { Subscription, Subject } from 'rxjs';
@@ -43,7 +42,6 @@ export class PagoComponent implements OnInit, OnDestroy {
   selected;
 
   constructor(
-    private fb: FormBuilder,
     private store: Store<AppState>,
     private calS: CalendarService
   ) { }

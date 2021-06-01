@@ -1,5 +1,4 @@
 import { DashboardService } from './../../dashboard/dashboard.service';
-import { CitaService } from './../../services/cita.service';
 import { Router } from '@angular/router';
 import { startCita, setContador } from './../progreso/progreso.actions';
 import Swal from 'sweetalert2';
@@ -150,8 +149,6 @@ export class CitasComponent implements OnInit, OnDestroy {
     })
   }
 
-
-
   calendarVisible = true;
   calendarOptions: CalendarOptions = {
     headerToolbar: {
@@ -173,8 +170,6 @@ export class CitasComponent implements OnInit, OnDestroy {
     select: this.handleDateSelect.bind(this),
     eventsSet: this.handleEvents.bind(this)
   };
-
-
 
   atras() {
     this.siguiente = false;
@@ -222,8 +217,6 @@ export class CitasComponent implements OnInit, OnDestroy {
     });
 
     if (this.bien) {
-
-      // this.modalService.open(this.content)
       const modalRef = this.modalService.open(this.content);
       modalRef.result.then((result) => {
         if (result) {
@@ -274,8 +267,6 @@ export class CitasComponent implements OnInit, OnDestroy {
   handleEvents(events: EventApi[]) {
     this.currentEvents = events;
   }
-
-
 
   opcionControl = new FormControl();
   opcionGroups: OpcionGroup[] = [

@@ -3,7 +3,6 @@ import { Fecha } from './../models/fecha.model';
 import { Injectable } from '@angular/core';
 import * as Firebase from 'firebase/app';
 
-
 import 'firebase/firestore';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';

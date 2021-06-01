@@ -7,16 +7,12 @@
             <h1 class="head" style="font-family: 'Days One', sans-serif; margin-top: 120px">{{titulo}} {{dia | date: 'dd/MM/yyyy'}}</h1>
         </section>
         <br class="clearfix">
-
-        <!-- <h2><b></b></h2> -->
         <button [disabled]="reparando" class="btn" (click)="reparar()">Reparar</button>
 
         <div class="row m-5">
-
             <div class="col-12">
                 <mat-progress-bar mode="determinate" [value]="contador"></mat-progress-bar>
                 {{contador | number: '1.0-0'}}%
-
                 <ul>
                     <li *ngFor="let item of visibles;let i = index">Reparación <strong>{{item[i].value | select | lowercase}}</strong> completada</li>
                     <li *ngIf="contador>=100">Todas las reparaciones han sido completadas</li>
