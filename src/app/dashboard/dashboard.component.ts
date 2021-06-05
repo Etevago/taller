@@ -115,6 +115,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.store.dispatch(reparar())
         this.store.dispatch(setContador({ actual: this.contador }))
       }
+      
       this.store.select("contador")
         .pipe(takeUntil(this.unsubscribe))
         .subscribe((cont) => {

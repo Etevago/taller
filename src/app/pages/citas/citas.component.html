@@ -36,7 +36,6 @@
         <button class="btn btn-secondary" style="float:right;" (click)="atras()">Atrás</button>
         <full-calendar [options]='calendarOptions'></full-calendar>
     </div>
-
 </div>
 
 <ng-template #content let-c="close" let-d="dismiss">
@@ -54,7 +53,5 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-dark" (click)="c(horaSeleccionada.value)">Confirmar</button>
-        <!-- <button type="submit" class="btn btn-outline-dark">Guardar</button> -->
-
     </div>
 </ng-template>

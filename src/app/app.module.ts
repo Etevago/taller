@@ -12,6 +12,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { APP_BASE_HREF } from '@angular/common';
 
 
 @NgModule({
@@ -34,7 +35,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     BrowserAnimationsModule,
     NgbModule,
   ],
-  providers: [],
+  providers: [{ provide: APP_BASE_HREF, useValue: '/pages/citas/'}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

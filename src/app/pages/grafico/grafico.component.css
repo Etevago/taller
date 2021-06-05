@@ -1,0 +1,16 @@
+.leyenda {
+    margin-left: 204px;
+    position: absolute;
+    margin-top: 68px;
+}
+
+.leyenda2 {
+    margin-left: 240px;
+    position: absolute;
+    margin-top: 87px;
+}
+
+.clearfix {
+    float: none;
+    clear: both;
+}

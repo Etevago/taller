@@ -102,7 +102,6 @@ export class GraficoComponent implements OnInit {
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(({ calendar }: any) => {
           this.reparaciones = calendar
-          console.log(this.reparaciones);
           for (let i = 0; i < 12; i++) {
             let pago = 0
             let cita = 0
@@ -113,7 +112,6 @@ export class GraficoComponent implements OnInit {
                 cita++
               }
             });
-            console.log(pago);
             this.costes.push(pago)
             this.citas.push(cita)
           }
@@ -129,11 +127,9 @@ export class GraficoComponent implements OnInit {
   }
 
   public chartClicked({ event, active }: { event: MouseEvent, active: {}[] }): void {
-    console.log(event, active);
   }
 
   public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
-    console.log(event, active);
   }
 
   ngOnDestroy() {

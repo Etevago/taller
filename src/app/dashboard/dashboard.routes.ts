@@ -13,5 +13,4 @@ export const dashboardRoutes: Routes = [
     { path: 'historico', component: HistoricoComponent },
     { path: 'grafico', component: GraficoComponent },
     { path: '', redirectTo: "citas" },
-
 ]
